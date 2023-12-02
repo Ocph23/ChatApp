@@ -1,0 +1,65 @@
+@ChatApp_HostAddress = https://localhost:7148
+@token =Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ3ZjgzNjM5LTk1NjctNDAzOS1iYjU0LTMxODU3MTlmZDA1MSIsIm5hbWUiOiJlbGlzaDAzQGdtYWlsLmNvbSIsInN1YiI6ImVsaXNoMDNAZ21haWwuY29tIiwiZW1haWwiOiJlbGlzaDAzQGdtYWlsLmNvbSIsImp0aSI6ImUzOGI3MTY3LTI2ZTYtNGJjYy04NmM2LWU0OTI3NDgwYTFiYyIsInJvbGUiOiJVc2VyIiwibmJmIjoxNzAxNTM3MTEzLCJleHAiOjE3MDIxNDE5MTMsImlhdCI6MTcwMTUzNzExMywiaXNzIjoiaHR0cHM6Ly9jaGF0YXBwLmFwc3BhcHVhLmNvbS8iLCJhdWQiOiJodHRwczovL2NoYXRhcHAuYXBzcGFwdWEuY29tLyJ9.T_r2RKTkwz56N92Y8b5ZRF7hhjVu6FnkhCQFxlowodKvh9oXkACmkra3jVZKsuHQGYg8EE7Ju9wb7eiaVZ-CLA
+### eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQwMzBmOWU1LWE2MmYtNGVmZS05MWQyLTYxZWE5MjNmODc3YiIsIm5hbWUiOiJhZG1pbkBnbWFpbC5jb20iLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImp0aSI6ImUxNjBlZjE2LTVjMGMtNGQxZi04MDkzLTk0NGM0OTk1MjBjOCIsInJvbGUiOiJBZG1pbiIsIm5iZiI6MTcwMTUzNTE3MywiZXhwIjoxNzAyMTM5OTczLCJpYXQiOjE3MDE1MzUxNzMsImlzcyI6Imh0dHBzOi8vY2hhdGFwcC5hcHNwYXB1YS5jb20vIiwiYXVkIjoiaHR0cHM6Ly9jaGF0YXBwLmFwc3BhcHVhLmNvbS8ifQ.NqAbeT5mNm8w40H3D1Ek7Hoe2Fn97tDUQZ5MlYEso7QmK-S-5P961qv8CHKRXWO0IMmpqcUthzY97Gw53Atx9Q
+
+POST {{ChatApp_HostAddress}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName":"admin@gmail.com",
+  "password":"Password@123"
+}
+
+
+###########
+
+GET {{ChatApp_HostAddress}}/api/Contact/addtemanbyuserName/admin@gmail.com
+Accept: application/json
+Authorization:{{token}}
+
+##########
+
+
+
+POST {{ChatApp_HostAddress}}/api/Contact/creategroup
+Content-Type: application/json
+Authorization:{{token}}
+
+{
+  "id": 0,
+  "nameGroup": "C# Group",
+  "description": "Apalah",
+  "created": "2023-12-02T17:13:59.180Z",
+  "owner": "string"
+}
+
+##########
+
+
+
+GET {{ChatApp_HostAddress}}/api/contact
+Accept: application/json
+Authorization:{{token}}
+
+##########
+
+
+GET {{ChatApp_HostAddress}}/api/Contact/addanggota/2/d030f9e5-a62f-4efe-91d2-61ea923f877b
+Accept: application/json
+Authorization:{{token}}
+
+##########
+
+
+
+
+GET {{ChatApp_HostAddress}}/api/Contact/group/2
+Accept: application/json
+Authorization:{{token}}
+
+##########
+
+GET {{ChatApp_HostAddress}}/weatherforecast
+Accept: application/json
+
+###

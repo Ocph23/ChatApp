@@ -1,0 +1,67 @@
+﻿@*  @inherits LayoutComponentBase
+ <MudDialogProvider />
+ <MudSnackbarProvider />
+ <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" Theme="MyCustomTheme" />
+ <MudLayout>
+     <div style="display:flex;justify-content:center;align-items:center">
+         @Body
+     </div>
+ </MudLayout>
+ @inject AuthenticationStateProvider authStateProvider
+ @inject NavigationManager navManager
+
+ @code {
+     bool _drawerOpen = true;
+
+     void DrawerToggle()
+     {
+         _drawerOpen = !_drawerOpen;
+     }
+
+     private bool _isDarkMode;
+     private MudThemeProvider _mudThemeProvider;
+
+     protected override async Task OnInitializedAsync()
+     {
+        
+     }
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+     {
+         if (firstRender)
+         {
+             _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+             await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
+             StateHasChanged();
+         }
+     }
+
+     private Task OnSystemPreferenceChanged(bool newValue)
+     {
+         _isDarkMode = newValue;
+         StateHasChanged();
+         return Task.CompletedTask;
+     }
+
+
+     MudTheme MyCustomTheme = new MudTheme()
+         {
+             Palette = new PaletteLight()
+             {
+                 Primary = Colors.Blue.Default,
+                 Secondary = Colors.Green.Accent4,
+                 AppbarBackground = Colors.Red.Default,
+             },
+             PaletteDark = new PaletteDark()
+             {
+                 Primary = Colors.Blue.Lighten1
+             },
+
+             LayoutProperties = new LayoutProperties()
+             {
+                 DrawerWidthLeft = "260px",
+                 DrawerWidthRight = "300px"
+             }
+         };
+ }
+ *@

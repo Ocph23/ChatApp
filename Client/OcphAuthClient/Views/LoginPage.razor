@@ -1,0 +1,62 @@
+﻿@page "/account/login"
+@using Morris.Blazor.FluentValidation;
+@using Morris.Blazor.Validation;
+@using OcphApiAuth;
+@using OcphApiAuth.Client;
+@using OcphApiAuth.Client.Validators;
+    using Client.OcphAuthClient.Models;
+
+@inject IAccountService accountService
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authStateProvider
+
+<h1>Login</h1>
+<EditForm Model="loginRequest" OnValidSubmit="OnValidSubmitAction">
+    <InputText @bind-Value="loginRequest.UserName"></InputText>
+    <InputText @bind-Value="loginRequest.Password"></InputText>
+    <button type="submit">Login</button>
+</EditForm>
+
+@code {
+    LoginRequest loginRequest = new LoginRequest();
+
+    async Task OnValidSubmitAction(EditContext context)
+    {
+        try
+        {
+            var result = await accountService.Login(loginRequest);
+            if (result != null)
+            {
+                var userProfider = await authStateProvider.GetAuthenticationStateAsync();
+                if (userProfider.User.IsInRole("Admin"))
+                {
+                    navigationManager.NavigateTo("/admin");
+                    return;
+                }
+
+                if (userProfider.User.IsInRole("Diakonia"))
+                {
+                    navigationManager.NavigateTo("/Diakonia");
+                    return;
+                }
+
+                if (userProfider.User.IsInRole("Rayon"))
+                {
+                    navigationManager.NavigateTo("/rayon");
+                    return;
+                }
+
+                if (userProfider.User.IsInRole("Jemaat"))
+                {
+                    navigationManager.NavigateTo("/jemaat");
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            var xxx = ex.Message;
+        }
+    }
+
+}

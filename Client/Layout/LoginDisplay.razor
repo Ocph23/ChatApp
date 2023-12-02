@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using OcphApiAuth.Client
+@inject NavigationManager Navigation
+@inject IAccountService accountService
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity?.Name!
+        <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="account/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public async void BeginLogOut()
+    {
+        await accountService.Logout();
+    }
+}

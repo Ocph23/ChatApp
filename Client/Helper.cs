@@ -7,7 +7,7 @@ namespace Client
     {
 
 
-        public static string ClientURL => "https://localhost:7148";
+        public static string ServerURL => "https://localhost:7148";
 
 
         public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };

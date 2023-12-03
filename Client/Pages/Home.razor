@@ -1,8 +1,12 @@
 ﻿@page "/"
 
-@using Client.Models
 @using Microsoft.AspNetCore.SignalR.Client
+@using Shared
+
 @inject ILocalStorageService LocalStorageService
+@inject IContactService contactService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ChatClient chatClient
 
 <PageTitle>Home</PageTitle>
 
@@ -32,14 +36,20 @@ Welcome to your new app.
         <input @bind="messageInput" size="50" />
     </label>
 </div>
-<button @onclick="@(()=> chat.Send(messageInput))" >Send</button>
+
+
+<button @onclick="SetCurentRoom">Chat To</button>
+<button @onclick="@(()=>  chatClient.Send(messageInput))">Send</button>
 
 <hr>
 
 <ul id="messagesList">
-    @foreach (var message in messages)
+    @if (chatClient != null && chatClient.CurrentRoom != null)
     {
-        <li>@message</li>
+        @foreach (var message in chatClient.CurrentRoom.Messages)
+        {
+            <li>@($"{message.Tanggal} - {message.Text}")</li>
+        }
     }
 </ul>
 
@@ -49,23 +59,23 @@ Welcome to your new app.
     private string? userInput;
     private string? messageInput;
 
-    ChatPrivate chat;
-
-
     protected override async Task OnInitializedAsync()
     {
-        var _myAccessToken = await LocalStorageService.GetItemAsync<string>("token");
-
-        chat = new ChatPrivate(new User(), _myAccessToken);
-
-        chat.OnReciveMessage += OnReciveMessage;
-
+        await chatClient.Start();
+        chatClient.OnReciveMessage += OnReciveMessage;
     }
 
-    void OnReciveMessage(object obj, EventArgs ev )
+    void OnReciveMessage(object obj, EventArgs ev)
     {
         var message = obj as Message;
         messages.Add(message.Text);
+        StateHasChanged();
+    }
+
+
+    async Task SetCurentRoom()
+    {
+        await chatClient.SetCurrentChat(userInput);
         StateHasChanged();
     }
 }

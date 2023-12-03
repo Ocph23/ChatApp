@@ -9,7 +9,7 @@ namespace ChatApp
 
         public static IEnumerable<TemanDTO> ToAnggotaDTO(this IEnumerable<AnggotaGroup> list)
         {
-            return list.Select(x => new TemanDTO() { Email=x.Anggota.Email, Keanggotaan=x.Keanggotaan, Nama=x.Anggota.Name, UserId=x.Anggota.Id });
+            return list.Select(x => new TemanDTO() { Email=x.Anggota.Email, Keanggotaan=x.Keanggotaan, Nama=x.Anggota.Name, TemanId=x.Anggota.Id });
         }
 
         public static string? GetUserId (this ClaimsPrincipal claim)

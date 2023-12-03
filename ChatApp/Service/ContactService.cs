@@ -1,19 +1,10 @@
 ﻿using ChatApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using Shared.Contracts;
 
 namespace ChatApp.Service
 {
-    public interface IContactService
-    {
-        Task<Contact> Get(string? userid);
-        Task<TemanDTO> AddTeman(string userid, string temanId);
-        Task<bool> DeleteTeman(string userid, string temanId);
-        Task<GroupDTO> CreateGroup(string userid, GroupDTO group);
-        Task<bool> AddAnggota(int groupid, string userId);
-        Task<TemanDTO> AddTemanByUserName(string userid, string temanId);
-        Task<GroupDTO> GetGroup(int groupid);
-    }
 
 
     public class ContactService : IContactService
@@ -55,7 +46,7 @@ namespace ChatApp.Service
                 };
                 dbcontext.Pertemanan.Add(pertemanan);
                 dbcontext.SaveChanges();
-                return Task.FromResult(new TemanDTO { UserId = temanId, Email = pertemanan.Teman.Email, Nama = pertemanan.Teman.Name });
+                return Task.FromResult(new TemanDTO { TemanId = temanId, Email = pertemanan.Teman.Email, Nama = pertemanan.Teman.Name });
             }
             catch (Exception)
             {
@@ -93,7 +84,7 @@ namespace ChatApp.Service
 
                 dbcontext.Pertemanan.Add(pertemanan);
                 dbcontext.SaveChanges();
-                return Task.FromResult(new TemanDTO { UserId = newTeman.Id, Email = pertemanan.Teman.Email, Nama = pertemanan.Teman.Name });
+                return Task.FromResult(new TemanDTO { TemanId = newTeman.Id, Email = pertemanan.Teman.Email, Nama = pertemanan.Teman.Name });
             }
             catch (Exception)
             {
@@ -151,12 +142,20 @@ namespace ChatApp.Service
                 var user = dbcontext.Users.FirstOrDefault(x => x.Id == userid);
                 ArgumentNullException.ThrowIfNull(user, "Akun tidak ditemukan !");
                 var contact = new Contact(userid, user.Name, user.UserName, user.Email);
-                var temans = dbcontext.Pertemanan.Include(x => x.Teman)
+                var temans = dbcontext.Pertemanan
+                    .Include(x => x.Teman)
+                    .Include(x => x.User)
                     .Where(x => x.UserId == userid || x.Teman.Id == userid).Select(x =>
-                    new TemanDTO { Nama = x.Teman.Name, UserId = x.Teman.Id, Email = x.Teman.Email });
+                    new TemanDTO
+                    {
+                        Nama = x.UserId == userid ? x.Teman.Name : x.User.Name,
+                        TemanId = x.UserId == userid ? x.Teman.Id : x.UserId,
+                        Email = x.UserId == userid ? x.Teman.Email : x.User.Email,
+                    });
+
                 if (temans.Any())
                 {
-                    contact.Frients = temans.ToList();
+                    contact.Friends = temans.ToList();
                 }
 
                 var anggotaGroup = from x in dbcontext.Group.Include(x => x.Anggota)
@@ -188,7 +187,7 @@ namespace ChatApp.Service
             }
         }
 
-       
+
         public Task<GroupDTO> GetGroup(int groupid)
         {
             try
@@ -208,7 +207,7 @@ namespace ChatApp.Service
                     NameGroup = anggotaGroup.Nama,
                     Owner = anggotaGroup.Pembuat.Name,
                     Id = anggotaGroup.Id,
-                    Anggota =anggotaGroup.Anggota.ToAnggotaDTO()
+                    Anggota = anggotaGroup.Anggota.ToAnggotaDTO()
                 };
 
                 return Task.FromResult(groupDTO);

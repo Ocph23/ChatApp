@@ -10,6 +10,7 @@ using OcphAspCoreApiAuth.Server;
 using ChatApp.Service;
 using OcphApiAuth;
 using Microsoft.OpenApi.Models;
+using Shared.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 

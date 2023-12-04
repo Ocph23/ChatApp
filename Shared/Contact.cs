@@ -6,10 +6,10 @@ namespace Shared
     public class Contact
     {
         public string? UserId { get; set; }
-        public string Name { get;  set; }
+        public string? Name { get;  set; }
         public string? UserName { get; set; }
-        public ICollection<TemanDTO> Friends { get; set; } = new List<TemanDTO>();
-        public ICollection<GroupDTO> Groups { get; set; } = new List<GroupDTO>();
+        public ICollection<TemanDTO>? Friends { get; set; } = new List<TemanDTO>();
+        public ICollection<GroupDTO>? Groups { get; set; } = new List<GroupDTO>();
         public string? Email { get; set; }
 
         public Contact()

@@ -1,6 +1,6 @@
-﻿using Blazored.LocalStorage;
-using Client;
+﻿using Client;
 using MarampaApp;
+using Shared;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
@@ -23,7 +23,7 @@ namespace OcphApiAuth.Client
 
                     string? stringContent = await response.Content.ReadAsStringAsync();
                     ArgumentNullException.ThrowIfNullOrEmpty(stringContent);
-                    var result = JsonSerializer.Deserialize<T>(stringContent, Helper.JsonOptions);
+                    var result = JsonSerializer.Deserialize<T>(stringContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     ArgumentNullException.ThrowIfNull(result);
                     return result;
                 }
@@ -36,14 +36,14 @@ namespace OcphApiAuth.Client
         }
 
 
-        public static async Task SetToken(this HttpClient httpClient, ILocalStorageService localStorageService)
+        public static async Task SetToken(this HttpClient httpClient)
         {
             try
             {
-                var token = await localStorageService.GetItemAsync<string>("token");
+                var token = Preferences.Get("token",string.Empty);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
         }
@@ -63,14 +63,13 @@ namespace OcphApiAuth.Client
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return $"'{response.RequestMessage.RequestUri.LocalPath}'  Not Found";
 
-
                 if (response.StatusCode == System.Net.HttpStatusCode.MethodNotAllowed)
                     return $"'{response.RequestMessage.RequestUri.LocalPath}'  Method Not Allowed";
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
 
-                    return $"'{response.RequestMessage.RequestUri.LocalPath}'  Anda Tidak Memiliki Akses !";
+                    return $"Not Have Access !";
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
@@ -79,40 +78,40 @@ namespace OcphApiAuth.Client
 
                 if (content.Contains("message"))
                 {
-                    var error = JsonSerializer.Deserialize<ErrorMessage>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    return error.Message;
+                    var error = JsonSerializer.Deserialize<ErrorMessage>(content, Helper.JsonOptions);
+                    return error.Message!   ;
                 }
                 else if (content.Contains("tools.ietf"))
                 {
-                    var errors = JsonSerializer.Deserialize<ErrorMessages>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    return errors.Title;
+                    var errors = JsonSerializer.Deserialize<ErrorMessages>(content, Helper.JsonOptions);
+                    return errors.Title!;
                 }
                 return content;
             }
             catch (Exception)
             {
-                return "Maaf Terjadi Kesalahan, Silahkan Ulangi Lagi Nanti";
+                return "Upssss Sory ! Try Again.";
             }
         }
     }
 
     public class ErrorMessage
     {
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 
     public class Errors
     {
-        public List<string> Email { get; set; }
+        public List<string>? Email { get; set; }
     }
 
     public class ErrorMessages
     {
-        public string Type { get; set; }
-        public string Title { get; set; }
+        public string? Type { get; set; }
+        public string? Title { get; set; }
         public int Status { get; set; }
-        public string TraceId { get; set; }
-        public Errors Errors { get; set; }
+        public string? TraceId { get; set; }
+        public Errors? Errors { get; set; }
     }
 
 }

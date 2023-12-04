@@ -9,6 +9,7 @@
 @inject IAccountService accountService
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authStateProvider
+@inject ILocalStorageService localStorageService
 
 <h1>Login</h1>
 <EditForm Model="loginRequest" OnValidSubmit="OnValidSubmitAction">
@@ -27,6 +28,15 @@
             var result = await accountService.Login(loginRequest);
             if (result != null)
             {
+
+                await localStorageService.SetItemAsync("token", result.Token);
+                await localStorageService.SetItemAsync("userName", result.UserName);
+                await localStorageService.SetItemAsync("email", result.Email);
+                await authStateProvider.GetAuthenticationStateAsync();
+
+
+
+
                 var userProfider = await authStateProvider.GetAuthenticationStateAsync();
                 if (userProfider.User.IsInRole("Admin"))
                 {

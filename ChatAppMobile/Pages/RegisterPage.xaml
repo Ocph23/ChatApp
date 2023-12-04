@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="ChatAppMobile.Pages.RegisterPage"
+             
+             Title="">
+    <ScrollView>
+        <VerticalStackLayout
+         Padding="30,0"
+         Spacing="25">
+            <Image
+             Source="dotnet_bot.png"
+             HeightRequest="185"
+             Aspect="AspectFit"
+             SemanticProperties.Description="dot net bot in a race car number eight" />
+
+            <Label FontSize="Medium" Text="Register"></Label>
+            <Entry Placeholder="Nama" Text="{Binding Name}"></Entry>
+            <Entry Placeholder="Email/UserName" Text="{Binding UserName}">
+                <Entry.Behaviors>
+                    <toolkit:EmailValidationBehavior InvalidStyle="{StaticResource InvalidEntryStyle}" Flags="ValidateOnValueChanged" ></toolkit:EmailValidationBehavior>
+                </Entry.Behaviors>
+            </Entry>
+            <Entry Placeholder="Telepon" Text="{Binding Telepon}"></Entry>
+            <Entry Placeholder="Password" IsPassword="True" Text="{Binding Password}"></Entry>
+            <Entry Placeholder="Confirm Password" IsPassword="True" Text="{Binding ConfirmPassword}"/>
+            <Label Text="{Binding Error}" IsVisible="{Binding IsHasError}" Style="{StaticResource InvalidLabelStyle}"></Label>
+            <ActivityIndicator WidthRequest="45" HorizontalOptions="Center" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"></ActivityIndicator>
+            <Button Text="Register" SemanticProperties.Hint="Register" Command="{Binding RegisterCommand}" HorizontalOptions="Fill" />
+            <HorizontalStackLayout>
+                <Label FontSize="Micro" Text="Punya Akun ? "></Label>
+                <Label Margin="5,0" TextColor="OrangeRed" FontSize="Micro" Text="Login">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding LoginCommand}"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

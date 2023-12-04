@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="ChatAppMobile.Pages.LoginPage"
+             Title="LoginPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+         Padding="30,0"
+         Spacing="25">
+            <Image Margin="30"
+             Source="dotnet_bot.png"
+             HeightRequest="100"
+             Aspect="AspectFit"
+             SemanticProperties.Description="dot net bot in a race car number eight" />
+
+            <Label FontSize="Medium" Text="Login"></Label>
+            <Entry Placeholder="User Name" Text="{Binding UserName}">
+                <Entry.Behaviors>
+                    <toolkit:EmailValidationBehavior 
+             InvalidStyle="{StaticResource InvalidEntryStyle}"
+             Flags="ValidateOnValueChanged" ></toolkit:EmailValidationBehavior>
+                </Entry.Behaviors>
+            </Entry>
+            <Entry IsPassword="True" Text="{Binding Password}"></Entry>
+            <ActivityIndicator WidthRequest="45" HorizontalOptions="Center" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"></ActivityIndicator>
+            <Button Text="Login" Command="{Binding LoginCommand}" HorizontalOptions="Fill" ></Button>
+            <HorizontalStackLayout>
+                <Label FontSize="Micro" Text="Belum Punya Akun ? "></Label>
+                <Label Margin="5,0" TextColor="OrangeRed" FontSize="Micro" Text="Daftar">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding RegisterCommand}"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

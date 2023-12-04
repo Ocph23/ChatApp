@@ -5,14 +5,13 @@ using MarampaApp;
 using MarampaApp.Client.OcphAuthClient;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Shared;
 using Shared.Contracts;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-
 builder.Services.AddTransient<HttpClientAuthenticationHandler>();
-
 builder.Services.AddHttpClient("ChatApp",
     client => client.BaseAddress = new Uri(Helper.ServerURL))
     .AddHttpMessageHandler<HttpClientAuthenticationHandler>();

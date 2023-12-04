@@ -81,6 +81,7 @@
 
 </style>
 
+@inject ILocalStorageService localStorage
 
 @code {
     RegisterRequest registerRequest = new RegisterRequest() { Role = "Pasien" };
@@ -92,6 +93,10 @@
             var result = await accountService.Register(registerRequest);
             if (result != null)
             {
+                await localStorage.SetItemAsync("token", result.Token);
+                await localStorage.SetItemAsync("userName", result.UserName);
+                await localStorage.SetItemAsync("email", result.Email);
+                await authStateProvider.GetAuthenticationStateAsync();
                 var userProfider = await authStateProvider.GetAuthenticationStateAsync();
                 if (userProfider.User.IsInRole("Admin"))
                 {

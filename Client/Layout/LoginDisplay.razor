@@ -2,6 +2,10 @@
 @using OcphApiAuth.Client
 @inject NavigationManager Navigation
 @inject IAccountService accountService
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authStateProvider
+
+
 <AuthorizeView>
     <Authorized>
         Hello, @context.User.Identity?.Name!
@@ -15,6 +19,10 @@
 @code{
     public async void BeginLogOut()
     {
-        await accountService.Logout();
+        await localStorage.RemoveItemAsync("token");
+        await localStorage.RemoveItemAsync("userName");
+        await localStorage.RemoveItemAsync("email");
+        var result = await authStateProvider.GetAuthenticationStateAsync();
+        Navigation.NavigateTo("/",true);
     }
 }

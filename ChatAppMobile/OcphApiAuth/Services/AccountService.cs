@@ -1,5 +1,7 @@
 ﻿using ChatAppMobile;
 using Client.OcphAuthClient.Models;
+using Microsoft.Win32;
+using Shared;
 using System.Net.Http.Json;
 
 namespace OcphApiAuth.Client
@@ -12,6 +14,26 @@ namespace OcphApiAuth.Client
         {
             httpClient = _clientFactory;
         }
+
+        public async Task<UserDTO> GetProfile()
+        {
+            try
+            {
+                var response = await httpClient.GetAsync("api/account/profile");
+                if (response.IsSuccessStatusCode)
+                {
+                    var contentString = await response.Content.ReadAsStringAsync();
+                    UserDTO result = await response.GetResultAsync<UserDTO>();
+                    return result;
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
         public async Task<AuthenticateResponse> Login(LoginRequest model)
         {
             try
@@ -56,6 +78,23 @@ namespace OcphApiAuth.Client
                     {
                         return result;
                     }
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
+        public async Task<bool> UpdateUser(UserDTO user)
+        {
+            try
+            {
+                var response = await httpClient.PutAsJsonAsync($"api/account/profile/{user.Id}", user);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
                 }
                 throw new SystemException(await response.Error());
             }

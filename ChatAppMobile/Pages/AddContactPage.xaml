@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               CanBeDismissedByTappingOutsideOfPopup="False"
+               VerticalOptions="End"
+               HorizontalOptions="Fill"
+             x:Class="ChatAppMobile.Pages.AddContactPage">
+    <Grid>
+        <Frame>
+            <StackLayout>
+                <Label Style="{StaticResource inputLabel}" FontSize="20" Text="Tambah Kontak"></Label>
+                <Label Style="{StaticResource inputLabel}" Text="Email/Phone Number"></Label>
+                <Entry Text="{Binding Email}"  ></Entry>
+                <HorizontalStackLayout HorizontalOptions="End">
+                    <Button Margin="5,20" WidthRequest="100" Command="{Binding AddCommand}" Text="Tambah"></Button>
+                    <Button Margin="0,20" BackgroundColor="{StaticResource   Magenta}" WidthRequest="100" Command="{Binding CancelCommand}" Text="Batal"></Button>
+                </HorizontalStackLayout>
+            </StackLayout>
+        </Frame>
+    </Grid>
+</toolkit:Popup>

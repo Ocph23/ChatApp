@@ -4,15 +4,20 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ChatAppMobile"
-    Shell.FlyoutBehavior="Disabled"
+    xmlns:page="clr-namespace:ChatAppMobile.Pages"
     Title="ChatAppMobile">
+    
+    <TabBar>
+        <Tab Icon="dotnet_bot.png" Title="Message" >
+            <ShellContent Title="Chat"  
+                        ContentTemplate="{DataTemplate page:ChatPage}" />
+            <ShellContent Title="Group"
+                        ContentTemplate="{DataTemplate page:GroupPage}" />
+        </Tab>
+        <ShellContent Title="Profile" 
+                  Icon="profile.png"
+        ContentTemplate="{DataTemplate page:ProfilePage}" />
+    </TabBar>
 
-    <Tab Title="Domestic"
-            Icon="paw.png">
-        <ShellContent Title="Cats"
-                         ContentTemplate="{DataTemplate local:MainPage}" />
-        <ShellContent Title="Dogs"
-                        ContentTemplate="{DataTemplate local:MainPage}" />
-    </Tab>
 
 </Shell>

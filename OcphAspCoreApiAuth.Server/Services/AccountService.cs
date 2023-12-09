@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace OcphApiAuth
 {
-    public class AccountService<T,DB> : IAccountService<T> where T : class where DB : class
+    public class AccountService<T, DB> : IAccountService<T> where T : class where DB : class
     {
         private readonly AppSettings _appSettings;
         private readonly UserManager<T> userManager;
@@ -45,7 +45,7 @@ namespace OcphApiAuth
             }
         }
 
-        public async Task<AuthenticateResponse> Register(T user, string role, string password) 
+        public async Task<AuthenticateResponse> Register(T user, string role, string password)
         {
             try
             {
@@ -78,11 +78,7 @@ namespace OcphApiAuth
             }
         }
 
-        public Task<T> FindUserById(string id)
-        {
-            throw new NotImplementedException();
-        }
-
+        public async Task<T> FindUserById(string id) => await userManager.FindByIdAsync(id);
 
         public Task AddUserRole(string v, T user)
         {
@@ -100,7 +96,23 @@ namespace OcphApiAuth
             throw new NotImplementedException();
         }
 
-      
+        public async Task<bool> UpdateUser(T user)
+        {
+            try
+            {
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 
 

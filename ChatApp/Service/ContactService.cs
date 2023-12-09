@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared;
 using Shared.Contracts;
+using System.Runtime.Serialization;
 
 namespace ChatApp.Service
 {
@@ -59,19 +60,16 @@ namespace ChatApp.Service
         {
             try
             {
-                var newTeman = dbcontext.Users.FirstOrDefault(x => x.UserName == userName || x.Email == userName);
+                var newTeman = dbcontext.Users.FirstOrDefault(x => x.UserName.ToLower() == userName || x.Email.ToLower() == userName || x.PhoneNumber.ToLower() ==userName);
 
-                var exist = dbcontext.Pertemanan.Where(x => x.UserId == userid || x.TemanId == userid);
+                ArgumentNullException.ThrowIfNull(newTeman, "Data User Tidak Ditemukan ");
 
-                var xxx = exist.Where(x => x.TemanId == newTeman.Id || x.UserId == newTeman.Id);
-
-                if (xxx.Any())
+                var exist = dbcontext.Pertemanan.Where(x => (x.UserId == userid && x.TemanId == newTeman.Id)||(x.UserId==newTeman.Id && x.TemanId== userid));
+                if (exist.Any())
                 {
                     throw new System.Exception($"{userName}/{newTeman.Name} sudah menjadi teman Anda !");
                 }
 
-
-                ArgumentNullException.ThrowIfNull(newTeman, "Kontak tidak ditemukan.");
                 var pertemanan = new Pertemanan
                 {
                     TanggalBerteman = DateTime.Now.ToUniversalTime(),
@@ -141,7 +139,7 @@ namespace ChatApp.Service
             {
                 var user = dbcontext.Users.FirstOrDefault(x => x.Id == userid);
                 ArgumentNullException.ThrowIfNull(user, "Akun tidak ditemukan !");
-                var contact = new Contact(userid, user.Name, user.UserName, user.Email);
+                var contact = new Contact(userid, user.Name, user.UserName, user.Email, user.Photo );
                 var temans = dbcontext.Pertemanan
                     .Include(x => x.Teman)
                     .Include(x => x.User)
@@ -150,7 +148,7 @@ namespace ChatApp.Service
                     {
                         Nama = x.UserId == userid ? x.Teman.Name : x.User.Name,
                         TemanId = x.UserId == userid ? x.Teman.Id : x.UserId,
-                        Email = x.UserId == userid ? x.Teman.Email : x.User.Email,
+                        Email = x.UserId == userid ? x.Teman.Email : x.User.Email, Photo= x.User.Photo  
                     });
 
                 if (temans.Any())

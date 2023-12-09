@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChatAppMobile.Pages.ChatGroupRoom"
+             Title="ChatGroupRoom">
+    <VerticalStackLayout>
+        <StackLayout>
+            <Grid Margin="2"  ColumnDefinitions="auto, 80*,20* " HeightRequest="50" >
+                <Frame  Margin="5,0" Padding="0" VerticalOptions="Start" BackgroundColor="Silver" 
+                     HasShadow="True" Grid.Column="0" 
+                     WidthRequest="30" HeightRequest="30"
+                     CornerRadius="30"></Frame>
+                <Border StrokeThickness="0.5" Grid.Column="1" StrokeShape="RoundRectangle 0,10,10,10" Padding="5">
+                    <Border.Stroke>
+                        <LinearGradientBrush EndPoint="0,1">
+                            <GradientStop Color="Orange" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Stroke>
+                    <StackLayout>
+                        <Label Text="{Binding Text}"></Label>
+                    </StackLayout>
+                </Border>
+            </Grid>
+        </StackLayout>
+    </VerticalStackLayout>
+</ContentPage>

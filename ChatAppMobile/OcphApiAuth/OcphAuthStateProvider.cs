@@ -70,4 +70,18 @@ public class OcphAuthStateProvider
             return user;
         }
     }
+
+    public async Task<string> GetUserId()
+    {
+        var result = await this.GetAuthenticationStateAsync();
+        if (result.Identity.IsAuthenticated)
+        {
+            var claim= result.Claims.FirstOrDefault(x => x.Type == "");
+            if(claim != null)
+            {
+                return claim.Value;
+            }
+        }
+        return string.Empty;
+    }
 }

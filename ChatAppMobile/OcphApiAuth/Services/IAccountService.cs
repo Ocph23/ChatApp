@@ -1,5 +1,6 @@
 ﻿
 using Client.OcphAuthClient.Models;
+using Shared;
 
 namespace OcphApiAuth.Client
 {
@@ -8,5 +9,7 @@ namespace OcphApiAuth.Client
         Task<AuthenticateResponse> Login(LoginRequest login);
         Task<AuthenticateResponse> Register(RegisterRequest register);
         Task Logout();
+        Task<UserDTO> GetProfile();
+        Task<bool> UpdateUser(UserDTO user);
     }
 }

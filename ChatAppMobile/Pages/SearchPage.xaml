@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:local="clr-namespace:ChatAppMobile.Pages"
+               
+             x:Class="ChatAppMobile.Pages.SearchPage" >
+    <toolkit:Popup.Resources>
+        <Style TargetType="{x:Type local:SearchPage}">
+            <Setter Property="Color" Value="Green" />
+            <Setter Property="HorizontalOptions" Value="End" />
+            <Setter Property="VerticalOptions" Value="End" />
+            <Setter Property="CanBeDismissedByTappingOutsideOfPopup" Value="True" />
+        </Style>
+    </toolkit:Popup.Resources>
+
+    <toolkit:Popup.Content>
+        <Grid HorizontalOptions="Start" VerticalOptions="Start" Background="Yellow">
+            <Label 
+         Text="Welcome to .NET MAUI!"
+         VerticalOptions="Center" 
+         HorizontalOptions="Center" />
+        </Grid>
+    </toolkit:Popup.Content>
+   
+</toolkit:Popup>

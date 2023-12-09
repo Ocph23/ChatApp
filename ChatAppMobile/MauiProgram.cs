@@ -1,9 +1,13 @@
-﻿using Client;
+﻿using ChatAppMobile.Mocks;
+using ChatAppMobile.Models;
+using ChatAppMobile.Services;
+using Client;
 using CommunityToolkit.Maui;
 using MarampaApp.Client.OcphAuthClient;
 using Microsoft.Extensions.Logging;
 using OcphApiAuth.Client;
 using Shared;
+using Shared.Contracts;
 
 namespace ChatAppMobile
 {
@@ -19,6 +23,7 @@ namespace ChatAppMobile
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("Font Awesome 6 Free-Solid-900.otf", "FASolid");
                 });
 
 
@@ -35,6 +40,10 @@ namespace ChatAppMobile
 
         public static IServiceCollection AddClientService(this IServiceCollection services)
         {
+            services.AddScoped<ChatClient>();
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IContactService, ContactService>();
+
             return services;
         }
     }

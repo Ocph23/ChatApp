@@ -11,6 +11,7 @@ namespace OcphApiAuth
         Task<T> FindUserByUserName(string userName);
         Task<T> FindUserByEmail(string email);
         Task<IEnumerable<T>> GetUsers();
+        Task<bool> UpdateUser(T user);  
     }
 
 }

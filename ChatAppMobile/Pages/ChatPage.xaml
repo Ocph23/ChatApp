@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChatAppMobile.Pages.ChatPage"
+             Title="USTJ CHAT APP">
+    <ContentPage.ToolbarItems >
+        <ToolbarItem Text="Search" Clicked="ToolbarItem_Clicked" IconImageSource="add.png" />
+        <ToolbarItem Order="Secondary" Command="{Binding AddCommandContact}" Text="Tambah Kontak" IconImageSource="add.png" />
+    </ContentPage.ToolbarItems>
+    
+    <VerticalStackLayout >
+        <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="Single"
+                        SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
+                        SelectionChangedCommand="{Binding SelectCommand}">
+           
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
+                        <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
+                        <StackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label FontSize="Small" Text="{Binding Nama}"></Label>
+                            <Label FontSize="Micro" Text="xx"></Label>
+                        </StackLayout>
+                        <StackLayout Grid.Column="2" VerticalOptions="Center">
+                            <Label FontSize="Micro" Text="05:20" HorizontalOptions="Center"></Label>
+                            <Frame BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
+                                   BorderColor="Transparent"
+                                   WidthRequest="22" HeightRequest="22">
+                                <Label  FontSize="11" Text="3" HorizontalOptions="Center"></Label>
+                            </Frame>
+                        </StackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

@@ -76,7 +76,7 @@ public class OcphAuthStateProvider
         var result = await this.GetAuthenticationStateAsync();
         if (result.Identity.IsAuthenticated)
         {
-            var claim= result.Claims.FirstOrDefault(x => x.Type == "");
+            var claim= result.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier"));
             if(claim != null)
             {
                 return claim.Value;

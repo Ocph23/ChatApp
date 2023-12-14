@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace ChatAppMobile.Models
 {
-    public record ChatMessage (string? Text, DateTime? Tanggal, bool IsMe);
+    //public record ChatMessage (string? Text, DateTime? Tanggal, bool IsMe);
 }

@@ -54,11 +54,11 @@ namespace Client.Models
 
                 hubConnection.On<MessagePrivate?>("ReceivePrivateMessage", (message) =>
                 {
+                    OnReciveMessage?.Invoke(message, new EventArgs());
                     if (CurrentRoom is not null && CurrentRoom.IsPrivate)
                     {
                         var encodedMsg = $"{message.MessageType}: {message.Text}";
                         CurrentRoom.AddMessage(message);
-                        OnReciveMessage?.Invoke(message, new EventArgs());
                     }
                     else
                     {

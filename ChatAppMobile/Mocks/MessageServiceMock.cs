@@ -40,5 +40,10 @@ namespace ChatAppMobile.Mocks
             _messagesPrivate.Add(message);
             return Task.FromResult(message);
         }
+
+        public Task<bool> ReadMassage(string? temanId, string myId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

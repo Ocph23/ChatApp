@@ -69,14 +69,14 @@ Welcome to your new app.
     {
         var message = obj as Message;
         messages.Add(message.Text);
-        StateHasChanged();
+        InvokeAsync(()=> StateHasChanged());
     }
 
 
     async Task SetCurentRoom()
     {
         await chatClient.SetCurrentChat(userInput);
-        StateHasChanged();
+       await InvokeAsync(() => StateHasChanged());
     }
 }
 

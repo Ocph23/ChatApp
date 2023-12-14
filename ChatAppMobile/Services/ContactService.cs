@@ -1,4 +1,5 @@
-﻿using OcphApiAuth.Client;
+﻿using ChatAppMobile.Models;
+using OcphApiAuth.Client;
 using Shared;
 using Shared.Contracts;
 using System.Net.Http.Json;
@@ -10,8 +11,10 @@ namespace ChatAppMobile.Services
     {
         private readonly HttpClient httpClient;
         private string controller = "api/Contact";
+        private MobileContact _contact;
 
-        public ContactService(HttpClient httpClient) {
+        public ContactService(HttpClient httpClient)
+        {
             this.httpClient = httpClient;
         }
         public Task<bool> AddAnggota(int groupid, string userId)
@@ -19,19 +22,19 @@ namespace ChatAppMobile.Services
             throw new NotImplementedException();
         }
 
-        public Task<TemanDTO> AddTeman(string userid, string temanId)
+        public Task<TemanViewModel> AddTeman(string userid, string temanId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<TemanDTO> AddTemanByUserName(string username)
+        public async Task<TemanViewModel> AddTemanByUserName(string username)
         {
             try
             {
                 var response = await httpClient.GetAsync($"{controller}/addtemanbyuserName/{username}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.GetResultAsync<TemanDTO>();
+                    return await response.GetResultAsync<TemanViewModel>();
                 }
                 throw new SystemException(await response.Error());
             }
@@ -45,7 +48,7 @@ namespace ChatAppMobile.Services
         {
             try
             {
-                var response = await httpClient.PostAsJsonAsync($"{controller}/creategroup",group);
+                var response = await httpClient.PostAsJsonAsync($"{controller}/creategroup", group);
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.GetResultAsync<GroupDTO>();
@@ -75,16 +78,24 @@ namespace ChatAppMobile.Services
             }
         }
 
-        public async Task<Contact> Get()
+
+        public async Task<MobileContact> Get()
         {
             try
             {
-                var response = await httpClient.GetAsync($"{controller}");
-                if(response.IsSuccessStatusCode)
+                if (_contact == null)
                 {
-                    return await response.GetResultAsync<Contact>();
+                    var response = await httpClient.GetAsync($"{controller}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _contact = await response.GetResultAsync<MobileContact>();
+                    }
+                    else
+                    {
+                        throw new SystemException(await response.Error());
+                    }
                 }
-                throw new SystemException();
+                return _contact;
             }
             catch (Exception)
             {
@@ -101,12 +112,14 @@ namespace ChatAppMobile.Services
                 {
                     return await response.GetResultAsync<GroupDTO>();
                 }
-                throw new SystemException();
+                throw new SystemException(await response.Error());
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+
     }
 }

@@ -10,7 +10,10 @@
 
     public class ChatUserManager : IChatUserManager
     {
+
         Dictionary<string, string> listConnection = new Dictionary<string, string>();
+        Dictionary<string, string> groupConnection = new Dictionary<string, string>();
+
         public Task AddConnection(string? userId, string? connectionId)
         {
             lock (listConnection)
@@ -49,5 +52,45 @@
                 return Task.CompletedTask;
             }
         }
+
+
+
+        public Task AddToGroup(string? connectionId, string? groupName)
+        {
+            lock (groupConnection)
+            {
+                if (!groupConnection.TryGetValue(connectionId, out var connection))
+                {
+                    groupConnection.Add(connectionId, groupName);
+                }
+                else
+                {
+                    groupConnection[connectionId] = groupName;
+                }
+
+            }
+            return Task.CompletedTask;
+        }
+        public Task<string?> GetGroupByConnectionId(string connectionId)
+        {
+            if (listConnection.TryGetValue(connectionId, out var groupName))
+            {
+                return Task.FromResult(groupName)!;
+            }
+            return Task.FromResult(string.Empty)!;
+        }
+
+        public Task RemoveFromGroup(string connectionId)
+        {
+            lock (groupConnection)
+            {
+                if (groupConnection.TryGetValue((string)connectionId, out var groupName))
+                {
+                    groupConnection.Remove(connectionId);
+                }
+                return Task.CompletedTask;
+            }
+        }
+
     }
 }

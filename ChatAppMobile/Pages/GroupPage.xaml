@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:converter="clr-namespace:ChatAppMobile.Converters"
+             x:Name="page"
              x:Class="ChatAppMobile.Pages.GroupPage"
              Title="USTJ CHAT APP">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    <ContentPage.Resources>
+        <converter:IsNewCountConverter x:Key="isNewCountConverter"></converter:IsNewCountConverter>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems >
+        <ToolbarItem Text="Search" Clicked="ToolbarItem_Clicked" IconImageSource="add.png" />
+        <ToolbarItem Order="Secondary" Command="{Binding AddCommandGroup}" Text="Buat Group" IconImageSource="add.png" />
+    </ContentPage.ToolbarItems>
+
+    <VerticalStackLayout BackgroundColor="Red">
+        <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Groups}" SelectionMode="None">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid  BackgroundColor="Yellow" Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
+                        <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
+                        <StackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label FontSize="Small" Text="{Binding NameGroup}"></Label>
+                            <Label FontSize="Micro" Text="{Binding Description}"></Label>
+                        </StackLayout>
+                        <StackLayout Grid.Column="2" VerticalOptions="Center">
+                            <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
+                            <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
+                                BorderColor="Transparent"
+                                WidthRequest="22" HeightRequest="22">
+                                <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
+                            </Frame>
+                        </StackLayout>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}"
+                                               CommandParameter="{Binding .}"></TapGestureRecognizer>
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </VerticalStackLayout>
 </ContentPage>

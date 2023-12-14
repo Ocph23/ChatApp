@@ -1,35 +1,54 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Shared;
 using Shared.Contracts;
 using System;
 using ChatAppMobile.Services;
 
-using Contact = Shared.Contact;
+using CommunityToolkit.Mvvm.Messaging;
+using ChatAppMobile.Messages;
+using Shared;
 
 
 
 namespace ChatAppMobile.Models
 {
-    public class ChatClient  :IDisposable
+    public class ChatClient : IDisposable
     {
         private readonly IMessageService messageService;
         private readonly IContactService contactService;
 
         string auth_token;
-        public event EventHandler OnReciveMessage;
+        // public event EventHandler OnReciveMessage;
         private HubConnection hubConnection;
-        public Contact Contact { get; set; }
+        public MobileContact Contact { get; set; }
         public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
         public ChatClient(IMessageService messageService, IContactService contactService)
         {
             this.messageService = messageService;
             this.contactService = contactService;
-           
+
+            WeakReferenceMessenger.Default.Register<PrivateSendMessageChange>(this, (r, m) =>
+            {
+                if (m != null && m.Value != null)
+                {
+                    SendPrivateMessage(m.Value);
+                }
+            });
+
+
+            WeakReferenceMessenger.Default.Register<GroupSendMessageChange>(this, (r, m) =>
+            {
+                if (m != null && m.Value != null)
+                {
+                    SendGroup(m.Value);
+                }
+            });
+
+
         }
 
         public async Task Start()
         {
-            auth_token = Preferences.Get("token",string.Empty);
+            auth_token = Preferences.Get("token", string.Empty);
 
             if (hubConnection == null)
             {
@@ -43,30 +62,17 @@ namespace ChatAppMobile.Models
 
 
 
-                hubConnection.On<Message>("ReceiveMessage", (message) =>
+                hubConnection.On<MessageGroup>("ReceiveGroupMessage", (message) =>
                 {
                     var encodedMsg = $"{message.MessageType}: {message.Text}";
-                  //  Messages.Add(message);
-                    OnReciveMessage?.Invoke(message, new EventArgs());
+                    //  Messages.Add(message);
+                    // OnReciveMessage?.Invoke(message, new EventArgs());
                 });
 
 
                 hubConnection.On<MessagePrivate?>("ReceivePrivateMessage", (message) =>
                 {
-                    if (CurrentRoom is not null && CurrentRoom.IsPrivate)
-                    {
-                        var encodedMsg = $"{message.MessageType}: {message.Text}";
-                        CurrentRoom.AddMessage(message);
-                        OnReciveMessage?.Invoke(message, new EventArgs());
-                    }
-                    else
-                    {
-                        var teman = Contact.Friends.SingleOrDefault(x => x.TemanId == message.PengirimId);
-                        if (teman != null)
-                        {
-                            teman.Messages.Add(message);
-                        }
-                    }
+                    WeakReferenceMessenger.Default.Send(new PrivateMessageChange(message));
                 });
 
                 await hubConnection.StartAsync();
@@ -75,34 +81,38 @@ namespace ChatAppMobile.Models
 
             if (Contact == null)
             {
-                Contact = await contactService.Get();
-                if (Contact == null)
+                var contact = await contactService.Get();
+                Contact = new MobileContact();
+                if (contact != null)
                 {
-                    Contact = new Contact();
+                    foreach (var item in contact.Friends)
+                    {
+                        Contact.Friends.Add(item);
+                    }
                 }
             }
 
         }
-        public async Task Send(string messageText)
+
+        internal Task SendPrivateMessage(MessagePrivate message)
         {
             if (hubConnection is not null && IsConnected)
             {
-                if (CurrentRoom != null && CurrentRoom.IsPrivate)
-                {
-                    var message = new MessagePrivate() { Text = messageText, PengirimId = Contact.UserId, MessageType = Shared.MessageType.Text };
-                    _ = hubConnection.SendAsync("SendPrivateMessage", CurrentRoom.ReciveId, message);
-                    _ = CurrentRoom.AddMessage(message);
-                }
-                else
-                {
-                    var message = new MessageGroup() { Text = messageText, PengirimId = Contact.UserId, MessageType = Shared.MessageType.Text };
-                    await hubConnection.SendAsync("SendMessage", message);
+                _ = hubConnection.SendAsync("SendPrivateMessage", message.PenerimaId, message);
+            }
+            return Task.CompletedTask;
+        }
 
-                }
+        public async Task SendGroup(MessageGroup message)  ///group
+        {
+            if (hubConnection is not null && IsConnected)
+            {
+                var model = new MessageGroup() { Text = message.Text, GroupId = message.GroupId, PengirimId = Contact.UserId, MessageType = Shared.MessageType.Text };
+                await hubConnection.SendAsync("SendGroupMessage", model);
             }
         }
 
-        public ChatRoom CurrentRoom { get; set; }
+        //   public ChatRoom CurrentRoom { get; set; }
 
         public async Task SetCurrentChat(string userId)
         {
@@ -110,10 +120,13 @@ namespace ChatAppMobile.Models
             if (!contact.Messages.Any())
             {
                 var messages = await messageService.GetPrivateMessage(Contact.UserId, contact.TemanId);
-                contact.Messages = messages.ToList();
+                foreach (var item in messages)
+                {
+                    contact.Messages.Add(item);
+                }
             }
 
-            CurrentRoom = new ChatRoom(contact);
+            // CurrentRoom = new ChatRoom(contact);
         }
 
         public async void Dispose()
@@ -123,5 +136,6 @@ namespace ChatAppMobile.Models
                 await hubConnection.DisposeAsync();
             }
         }
+
     }
 }

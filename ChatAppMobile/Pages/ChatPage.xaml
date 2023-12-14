@@ -1,34 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converter="clr-namespace:ChatAppMobile.Converters"
              x:Class="ChatAppMobile.Pages.ChatPage"
+             x:Name="page"
              Title="USTJ CHAT APP">
+    <ContentPage.Resources>
+        <converter:IsNewCountConverter x:Key="isNewCountConverter"></converter:IsNewCountConverter>
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems >
         <ToolbarItem Text="Search" Clicked="ToolbarItem_Clicked" IconImageSource="add.png" />
         <ToolbarItem Order="Secondary" Command="{Binding AddCommandContact}" Text="Tambah Kontak" IconImageSource="add.png" />
     </ContentPage.ToolbarItems>
-    
+
     <VerticalStackLayout >
-        <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="Single"
+        <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="None"
                         SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                         SelectionChangedCommand="{Binding SelectCommand}">
-           
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
+                    <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
                         <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
                         <StackLayout Grid.Column="1" VerticalOptions="Center">
                             <Label FontSize="Small" Text="{Binding Nama}"></Label>
                             <Label FontSize="Micro" Text="xx"></Label>
                         </StackLayout>
                         <StackLayout Grid.Column="2" VerticalOptions="Center">
-                            <Label FontSize="Micro" Text="05:20" HorizontalOptions="Center"></Label>
-                            <Frame BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
+                            <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
+                            <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
                                    BorderColor="Transparent"
                                    WidthRequest="22" HeightRequest="22">
-                                <Label  FontSize="11" Text="3" HorizontalOptions="Center"></Label>
+                                <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
                             </Frame>
                         </StackLayout>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}"
+                                                  CommandParameter="{Binding .}"
+                                                  ></TapGestureRecognizer>
+                        </Grid.GestureRecognizers>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

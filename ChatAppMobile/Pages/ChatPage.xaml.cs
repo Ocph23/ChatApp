@@ -1,11 +1,10 @@
 using ChatAppMobile.Messages;
+using ChatAppMobile.Models;
 using ChatAppMobile.Services;
 using ChatAppMobile.ViewModels;
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Shared;
-using Shared.Contracts;
-using Contact = Shared.Contact;
 
 namespace ChatAppMobile.Pages;
 
@@ -29,9 +28,9 @@ public partial class ChatPage : ContentPage
 public class ChatViewModel : BaseViewModel 
 {
 
-    private Contact chatContact;
+    private MobileContact chatContact;
 
-    public Contact ChatContact
+    public MobileContact ChatContact
     {
         get { return chatContact; }
         set { SetProperty(ref chatContact, value); }
@@ -53,6 +52,17 @@ public class ChatViewModel : BaseViewModel
                 chatContact.Friends.Add(m.Value);
             }
         });
+
+
+        WeakReferenceMessenger.Default.Register<PrivateMessageChange>(this, (r, m) =>
+        {
+            if (m != null && m.Value != null)
+            {
+                var teman = ChatContact.Friends.FirstOrDefault(x => x.TemanId == m.Value.PengirimId);
+                teman.AddMessage(m.Value);
+                //teman.Messages.Add(m.Value);
+            }
+        });
         _ = Load();
     }
 
@@ -63,7 +73,7 @@ public class ChatViewModel : BaseViewModel
 
     private void SelectCommandAction(object obj)
     {
-        var teman = obj as TemanDTO;
+        var teman = obj as TemanViewModel;
         Shell.Current.Navigation.PushModalAsync(new Pages.ChatPrivatreRoom(teman));
     }
 
@@ -73,7 +83,6 @@ public class ChatViewModel : BaseViewModel
         {
             var service = ServiceHelper.GetService<IContactService>();
             ChatContact = await service.Get();
-
         }
         catch (Exception)
         {

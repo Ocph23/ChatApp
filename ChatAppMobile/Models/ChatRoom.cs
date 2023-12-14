@@ -4,14 +4,14 @@ namespace ChatAppMobile.Models
 {
     public class ChatRoom
     {
-        private TemanDTO? contact;
+        private TemanViewModel? contact;
 
         public string ReciveId => contact.TemanId;
 
         public bool IsPrivate = true;
         public ICollection<Message> Messages { get; set; } = new List<Message>();
 
-        public ChatRoom(TemanDTO? contact)
+        public ChatRoom(TemanViewModel? contact)
         {
             this.contact = contact;
             IsPrivate = true;

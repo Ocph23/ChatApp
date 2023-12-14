@@ -7,7 +7,6 @@ namespace ChatAppMobile
         {
             InitializeComponent();
             //MainPage = new AppShell();
-            //Preferences.Remove("user");
             string? token = Preferences.Get("token", string.Empty);
             if (string.IsNullOrEmpty(token))
             {

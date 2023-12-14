@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shared
 {
@@ -10,6 +11,10 @@ namespace Shared
         public string? PengirimId { get; set; }
         public DateTime? Tanggal { get; set; }
         public MessageStatus Status { get; set; }
+
+        [NotMapped]
+        public bool IsMe { get; set; }
+
     }
 
     public enum MessageStatus
@@ -21,6 +26,7 @@ namespace Shared
     {
         public int Id { get; set; }
         public string? PenerimaId { get; set; }
+        
     }
 
     public class MessageGroup : Message

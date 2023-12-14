@@ -86,6 +86,9 @@
 	  <MauiXaml Update="Pages\AddContactPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\AddGroupPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\ChatGroupRoom.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -30,6 +30,19 @@ namespace ChatApp.Service
                 throw;
             }
         }
+        public Task<bool> ReadMassage(string? temanId, string myId)
+        {
+            try
+            {
+                var message = dbcontext.PesanPrivat.Where(x => x.PengirimId == temanId && x.PenerimaId == myId)
+                    .ExecuteUpdate(x => x.SetProperty(x => x.Status, MessageStatus.Baca));
+                return Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public Task<IEnumerable<MessagePrivate>> GetPrivateMessage(string? userid1, string userid2)
         {
@@ -74,5 +87,7 @@ namespace ChatApp.Service
                 throw;
             }
         }
+
+        
     }
 }

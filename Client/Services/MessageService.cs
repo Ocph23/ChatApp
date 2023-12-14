@@ -82,5 +82,10 @@ namespace Client.Services
                 throw;
             }
         }
+
+        public Task<bool> ReadMassage(string? temanId, string myId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

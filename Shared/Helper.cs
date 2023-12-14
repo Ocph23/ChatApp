@@ -6,8 +6,8 @@ namespace Shared
     public class Helper
     {
 
-        //public static string ServerURL => "https://z016s16t-7148.asse.devtunnels.ms";
-        public static string ServerURL => "https://localhost:7148";
+        public static string ServerURL => "https://tbbthlx7-7148.asse.devtunnels.ms";
+      //  public static string ServerURL => "https://localhost:7148";
         public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         public static string TitleCaseWithSpace(string p) => Regex.Replace(p, @"(?<=[a-z])([A-Z])", @" $1");

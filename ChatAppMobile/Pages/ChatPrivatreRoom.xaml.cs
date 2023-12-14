@@ -1,5 +1,8 @@
+using ChatAppMobile.Messages;
 using ChatAppMobile.Models;
 using ChatAppMobile.ViewModels;
+using CommunityToolkit.Mvvm.Messaging;
+using OcphApiAuth.Client;
 using Shared;
 using Shared.Contracts;
 using System.Collections.ObjectModel;
@@ -10,7 +13,7 @@ public partial class ChatPrivatreRoom : ContentPage
 {
     private ChatPrivateRoomViewModel viewModels;
 
-    public ChatPrivatreRoom(Shared.TemanDTO? teman)
+    public ChatPrivatreRoom(TemanViewModel? teman)
     {
         InitializeComponent();
         BindingContext = viewModels = new ChatPrivateRoomViewModel(teman);
@@ -19,25 +22,24 @@ public partial class ChatPrivatreRoom : ContentPage
 
     private void ViewModels_OnAddItem(object? sender, EventArgs e)
     {
-        ChatMessage? chat = sender as ChatMessage;
-        if (chat != null)
-        {
-            list.ScrollTo(chat, ScrollToPosition.End);
-        }
-    }
+        var message = sender as MessagePrivate;
+        list.ScrollTo(message, ScrollToPosition.End);
+    }   
 
     public class ChatPrivateRoomViewModel : BaseViewModel
     {
 
+        public string MyId { get; set; }
+
         public event EventHandler OnAddItem;
 
-        public ObservableCollection<ChatMessage> Messages { get; set; } = new ObservableCollection<ChatMessage>();
+        public ObservableCollection<MessagePrivate> Messages { get; set; } = new ObservableCollection<MessagePrivate>();
 
 
-        public TemanDTO? Teman { get; set; }
+        public TemanViewModel? Teman { get; set; }
 
         private Command sendCommand;
-        private ChatClient chatClient;
+        //private ChatClient chatClient;
 
         public Command BackCommand { get; set; }
         public Command FileCommand { get; set; }
@@ -58,11 +60,30 @@ public partial class ChatPrivatreRoom : ContentPage
             set { SetProperty(ref message, value); }
         }
 
+        public ChatRoom CurrentRoom { get; private set; }
 
-        public ChatPrivateRoomViewModel(TemanDTO? teman)
+        public ChatPrivateRoomViewModel(TemanViewModel? teman)
         {
 
-            chatClient = ServiceHelper.GetService<ChatClient>();
+            WeakReferenceMessenger.Default.Register<PrivateMessageChange>(this, async (r, m) =>
+            {
+                try
+                {
+                    if (m != null && m.Value != null)
+                    {
+                        var data = m.Value;
+                        data.IsMe = false;
+                        if (!Messages.Any(x => x.Id == data.Id))
+                        {
+                            Messages.Add(data);
+                            OnAddItem?.Invoke(data, new EventArgs());
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            });
 
             FileCommand = new Command(FileCommandAction);
             BackCommand = new Command(BackCommandAction);
@@ -79,10 +100,36 @@ public partial class ChatPrivatreRoom : ContentPage
 
             _ = LoadMessage();
         }
+        private async Task LoadMessage()
+        {
+            var authProviderService = ServiceHelper.GetService<OcphAuthStateProvider>();
+            MyId = await authProviderService.GetUserId();
+            CurrentRoom = new ChatRoom(Teman);
+            var service = ServiceHelper.GetService<IMessageService>();
+            var messgaes = await service.GetPrivateMessage(Teman.TemanId, MyId);
+            foreach (var item in messgaes)
+            {
+                item.IsMe = item.PengirimId == MyId;
+                Messages.Add(item);
+                if (!item.IsMe)
+                {
+                    item.Status = MessageStatus.Baca;
+                }
+            }
+            OnAddItem?.Invoke(Messages.Last(), null);
+            var readed = await service.ReadMassage(Teman.TemanId, MyId);
+            if (readed)
+            {
+                foreach (var item in Teman.Messages)
+                {
+                    item.Status = MessageStatus.Baca;
+                }
+            }
+        }
 
         private void FileCommandAction(object obj)
         {
-            
+
             throw new NotImplementedException();
         }
 
@@ -100,21 +147,12 @@ public partial class ChatPrivatreRoom : ContentPage
 
         private async Task SendCommandAction(object obj)
         {
-            var m = new ChatMessage(Message, DateTime.Now, true);
-            Messages.Add(m);
-            OnAddItem?.Invoke(m, null);
+            var message = new MessagePrivate { PengirimId = MyId, IsMe = true, MessageType = MessageType.Text, Tanggal = DateTime.Now, Text = Message, PenerimaId = Teman.TemanId };
+            WeakReferenceMessenger.Default.Send(new PrivateSendMessageChange(message));
+            Messages.Add(message);
+            OnAddItem?.Invoke(message, null);
             await Task.Delay(200);
             Message = string.Empty;
-        }
-
-        private async Task LoadMessage()
-        {
-            var service = ServiceHelper.GetService<IMessageService>();
-            var messgae = await service.GetPrivateMessage("1", "2");
-            foreach (var item in messgae)
-            {
-                Messages.Add(new ChatMessage(item.Text, item.Tanggal, item.PengirimId == Teman.TemanId ? true : false));
-            }
         }
     }
 }

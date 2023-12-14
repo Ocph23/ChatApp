@@ -82,5 +82,20 @@ namespace ChatAppMobile.Services
                 throw;
             }
         }
+
+        public async Task<bool> ReadMassage(string? temanId, string myId)
+        {
+            try
+            {
+                var response = await httpClient.GetAsync($"{controller}/read/{temanId}/{myId}");
+                return response.IsSuccessStatusCode?true:false;
+            }                                                                       
+            catch 
+            {
+               return false;
+            }
+        }
+
+       
     }
 }

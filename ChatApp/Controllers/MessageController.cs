@@ -48,6 +48,21 @@ namespace ChatApp
             }
         }
 
+        [HttpGet("read/{temainId}/{mydId}")]
+        public async Task<ActionResult> RaadMessage(string? temainId, string mydId)
+        {
+            try
+            {
+                await messageService.ReadMassage(temainId, mydId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost("group")]
         public async Task<ActionResult<MessageGroup>> PostGroupMessage(MessageGroup mesage)
         {

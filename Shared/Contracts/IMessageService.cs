@@ -10,5 +10,6 @@ namespace Shared.Contracts
         Task<MessagePrivate> PostPrivateMessage(MessagePrivate message);
         Task<IEnumerable<MessageGroup>> GetGroupMessage(int groupId);
         Task<MessageGroup> PostGroupMessage(MessageGroup mesage);
+        Task<bool> ReadMassage(string? temanId, string myId);
     }
 }

@@ -60,6 +60,11 @@
 	  <None Remove="Resources\Fonts\Font Awesome 6 Brands-Regular-400.otf" />
 	  <None Remove="Resources\Fonts\Font Awesome 6 Free-Regular-400.otf" />
 	  <None Remove="Resources\Fonts\Font Awesome 6 Free-Solid-900.otf" />
+	  <None Remove="Resources\Images\mobilebg.jpg" />
+	  <None Remove="Resources\Images\mobilebg1.jpg" />
+	  <None Remove="Resources\Images\mobilebg2.jpg" />
+	  <None Remove="Resources\Images\mobilebg3.jpg" />
+	  <None Remove="Resources\Images\mobilebg4.jpg" />
 	  <None Remove="Resources\Images\profile.png" />
 	</ItemGroup>
 
@@ -84,6 +89,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\AddContactPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\AddGroupMember.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\AddGroupPage.xaml">

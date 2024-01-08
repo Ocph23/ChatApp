@@ -4,6 +4,7 @@
              xmlns:converter="clr-namespace:ChatAppMobile.Converters"
              x:Class="ChatAppMobile.Pages.ChatPage"
              x:Name="page"
+            BackgroundImageSource="mobilebg3.jpg"
              Title="USTJ CHAT APP">
     <ContentPage.Resources>
         <converter:IsNewCountConverter x:Key="isNewCountConverter"></converter:IsNewCountConverter>
@@ -12,34 +13,44 @@
         <ToolbarItem Text="Search" Clicked="ToolbarItem_Clicked" IconImageSource="add.png" />
         <ToolbarItem Order="Secondary" Command="{Binding AddCommandContact}" Text="Tambah Kontak" IconImageSource="add.png" />
     </ContentPage.ToolbarItems>
-
     <VerticalStackLayout >
+      
         <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="None"
                         SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                         SelectionChangedCommand="{Binding SelectCommand}">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
-                        <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
-                        <StackLayout Grid.Column="1" VerticalOptions="Center">
-                            <Label FontSize="Small" Text="{Binding Nama}"></Label>
-                            <Label FontSize="Micro" Text="xx"></Label>
-                        </StackLayout>
-                        <StackLayout Grid.Column="2" VerticalOptions="Center">
-                            <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
-                            <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
+                    <Frame Padding="0" Margin="2" BorderColor="Transparent"  Opacity="0.8">
+                        <Frame.Background>
+                            <LinearGradientBrush EndPoint="1,0">
+                                <GradientStop Color="#cfd9df"
+                          Offset="0.1" />
+                                <GradientStop Color="#e2ebf0"
+                          Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Frame.Background>
+                        <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
+                            <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label FontSize="Small" Text="{Binding Nama}"></Label>
+                                <Label FontSize="Micro" Text="{Binding Description}"></Label>
+                            </StackLayout>
+                            <StackLayout Grid.Column="2" VerticalOptions="Center">
+                                <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
+                                <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
                                    BorderColor="Transparent"
                                    WidthRequest="22" HeightRequest="22">
-                                <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
-                            </Frame>
-                        </StackLayout>
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}"
+                                    <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
+                                </Frame>
+                            </StackLayout>
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}"
                                                   CommandParameter="{Binding .}"
                                                   ></TapGestureRecognizer>
-                        </Grid.GestureRecognizers>
-                    </Grid>
+                            </Grid.GestureRecognizers>
+                        </Grid>
+                    </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

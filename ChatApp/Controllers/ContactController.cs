@@ -36,12 +36,12 @@ namespace ChatApp
             }
         }
 
-        [HttpGet("addanggota/{groupid}/{userId}")]
-        public async Task<ActionResult<bool>> AddAnggota(int groupid, string userId)
+        [HttpGet("addmember/{groupid}/{userName}")]
+        public async Task<ActionResult<bool>> AddAnggota(int groupid, string userName)
         {
             try
             {
-                var result = await contactService.AddAnggota(groupid, userId);
+                var result = await contactService.AddAnggota(groupid, userName);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -9,7 +9,7 @@ namespace ChatAppMobile.Services
         Task<TemanViewModel> AddTeman(string userid, string temanId);
         Task<bool> DeleteTeman(string userid, string temanId);
         Task<GroupDTO> CreateGroup(string userid, GroupDTO group);
-        Task<bool> AddAnggota(int groupid, string userId);
+        Task<TemanViewModel> AddAnggota(int groupid, string email);
         Task<TemanViewModel> AddTemanByUserName(string userName);
         Task<GroupDTO> GetGroup(int groupid);
     }

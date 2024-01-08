@@ -11,6 +11,8 @@ using ChatApp.Service;
 using OcphApiAuth;
 using Microsoft.OpenApi.Models;
 using Shared.Contracts;
+using Amazon.S3;
+using Amazon.S3.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,9 +99,13 @@ builder.Services.AddScoped<IAccountService<ApplicationUser>, AccountService<Appl
 builder.Services.AddOcphAuthServe(builder.Configuration);
 
 
-builder.Services.AddSingleton<IChatUserManager,ChatUserManager>();
-builder.Services.AddScoped<IContactService,ContactService>();
+builder.Services.AddSingleton<IChatUserManager, ChatUserManager>();
+builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+var op = builder.Configuration.GetAWSOptions();
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+
 var app = builder.Build();
 
 //database seed
@@ -130,7 +136,7 @@ using (var scope = app.Services.CreateScope())
         }
         else
         {
-           await userManager.DeleteAsync(user);
+            await userManager.DeleteAsync(user);
         }
     }
 }

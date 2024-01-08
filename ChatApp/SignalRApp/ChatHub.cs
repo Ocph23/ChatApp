@@ -1,7 +1,4 @@
 ﻿using ChatApp.Service;
-using Duende.IdentityServer.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Shared;
@@ -23,11 +20,13 @@ namespace ChatApp.SignalRApp
             this.dbContext = dbContext;
         }
 
-        public async Task SendGoupMessage(MessageGroup message)
+        public async Task SendGroupMessage(MessageGroup message)
         {
             var sender = Context.User!.GetUserId();
             var connection = await chatUserManager.GetConnectionId(sender!);
-            await Clients.All.SendAsync("ReceiveGroupMessage", message);
+            message.PengirimId = sender;
+            var saimdang = await messageService.PostGroupMessage(message);
+            await Clients.Groups($"G{message.GroupId}").SendAsync("ReceiveGroupMessage", message);
         }
 
         public async Task SendPrivateMessage(string reciveId, Message message)
@@ -58,14 +57,10 @@ namespace ChatApp.SignalRApp
             var rooms = dbContext.Group.Include(x => x.Anggota)
                 .ThenInclude(x => x.Anggota).SelectMany(x => x.Anggota).Where(x => x.Anggota.Id == userId);
 
-
             foreach (var room in rooms)
             {
-                Groups.AddToGroupAsync(Context.ConnectionId, room.GroupId.ToString());
+                Groups.AddToGroupAsync(Context.ConnectionId, $"G{room.GroupId}");
             }
-
-
-
             return base.OnConnectedAsync();
         }
 
@@ -78,7 +73,7 @@ namespace ChatApp.SignalRApp
                .ThenInclude(x => x.Anggota).SelectMany(x => x.Anggota).Where(x => x.Anggota.Id == userId);
             foreach (var room in rooms)
             {
-                Groups.RemoveFromGroupAsync(Context.ConnectionId, room.GroupId.ToString());
+                Groups.RemoveFromGroupAsync(Context.ConnectionId, $"G{room.GroupId}");
             }
             return base.OnDisconnectedAsync(exception);
         }

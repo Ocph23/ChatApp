@@ -17,14 +17,38 @@ namespace ChatAppMobile.Services
         {
             this.httpClient = httpClient;
         }
-        public Task<bool> AddAnggota(int groupid, string userId)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<TemanViewModel> AddTeman(string userid, string temanId)
+        public async Task<TemanViewModel> AddAnggota(int groupid, string email)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await httpClient.GetAsync($"{controller}/addmember/{groupid}/{email}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.GetResultAsync<TemanViewModel>();
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<TemanViewModel> AddTeman(string userid, string email)
+        {
+            try
+            {
+                var response = await httpClient.GetAsync($"{controller}/addmember/{email}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.GetResultAsync<TemanViewModel>();
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<TemanViewModel> AddTemanByUserName(string username)
@@ -119,7 +143,6 @@ namespace ChatAppMobile.Services
                 throw;
             }
         }
-
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Client;
+﻿using ChatAppMobile;
+using Client;
 using MarampaApp;
 using Shared;
 using System.Net;
@@ -40,7 +41,7 @@ namespace OcphApiAuth.Client
         {
             try
             {
-                var token = Preferences.Get("token",string.Empty);
+                var token = Preferences.Get("token", string.Empty);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
             catch (Exception)
@@ -68,7 +69,7 @@ namespace OcphApiAuth.Client
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-
+                    AppHelper.Login();
                     return $"Not Have Access !";
                 }
 
@@ -79,7 +80,7 @@ namespace OcphApiAuth.Client
                 if (content.Contains("message"))
                 {
                     var error = JsonSerializer.Deserialize<ErrorMessage>(content, Helper.JsonOptions);
-                    return error.Message!   ;
+                    return error.Message!;
                 }
                 else if (content.Contains("tools.ietf"))
                 {

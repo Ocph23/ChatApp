@@ -1,10 +1,13 @@
 using ChatAppMobile.Messages;
 using ChatAppMobile.ViewModels;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using OcphApiAuth.Client;
 using Shared;
 using Shared.Contracts;
 using System.Collections.ObjectModel;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ChatAppMobile.Pages;
 
@@ -24,6 +27,11 @@ public partial class ChatGroupRoom : ContentPage
         var message = sender as MessageGroup;
         list.ScrollTo(message, ScrollToPosition.End);
     }
+
+    private void ToolbarItem_Clicked(object sender, EventArgs e)
+    {
+
+    }
 }
 
 public class ChatGroupRoomViewModel : BaseViewModel
@@ -42,6 +50,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
     //private ChatClient chatClient;
 
     public Command BackCommand { get; set; }
+    public Command AddMemberCommand { get; private set; }
     public Command FileCommand { get; set; }
 
     public Command SendCommand
@@ -83,7 +92,8 @@ public class ChatGroupRoomViewModel : BaseViewModel
             }
         });
 
-        FileCommand = new Command(FileCommandAction);
+        AddMemberCommand = new Command(AddMemberAction);
+        FileCommand = new Command(async(x)=> FileCommandAction(x));
         BackCommand = new Command(BackCommandAction);
         SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
         Group = group;
@@ -99,9 +109,55 @@ public class ChatGroupRoomViewModel : BaseViewModel
         _ = LoadMessage();
     }
 
-    private void FileCommandAction(object obj)
+    private void AddMemberAction(object obj)
     {
-        throw new NotImplementedException();
+        Shell.Current.ShowPopupAsync(new AddGroupMember(Group));
+    }
+
+    private async Task FileCommandAction(object obj)
+    {
+        string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery", "Camera");
+        if(!string.IsNullOrEmpty(action))
+        {
+            if(action == "Galery")
+            {
+                try
+                {
+                    var result = await FilePicker.Default.PickAsync(new PickOptions());
+                    if (result != null)
+                    {
+                        if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("png", StringComparison.OrdinalIgnoreCase))
+                        {
+                            using var stream = await result.OpenReadAsync();
+                            using var memoryStream = new MemoryStream();
+                            await stream.CopyToAsync(memoryStream);
+                            var data = memoryStream.ToArray();  
+                            var image = ImageSource.FromStream(() => stream);
+                        }
+                    }
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    // The user canceled or something went wrong
+                }
+                return;
+            }
+
+
+
+            if (action == "Camera")
+            {
+
+
+                return;
+            }
+
+
+
+        }
+
     }
 
     private async Task LoadMessage()

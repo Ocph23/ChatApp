@@ -17,6 +17,7 @@ namespace Client.Models
 
         string auth_token;
         public event EventHandler OnReciveMessage;
+        public event EventHandler<MessageGroup> OnReciveGroupMessage;
         private HubConnection hubConnection;
         public Contact Contact { get; set; }
         public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
@@ -44,11 +45,11 @@ namespace Client.Models
 
 
 
-                hubConnection.On<Message>("ReceiveMessage", (message) =>
+                hubConnection.On<MessageGroup>("ReceiveGroupMessage", (message) =>
                 {
                     var encodedMsg = $"{message.MessageType}: {message.Text}";
                   //  Messages.Add(message);
-                    OnReciveMessage?.Invoke(message, new EventArgs());
+                    OnReciveGroupMessage?.Invoke(null, message);
                 });
 
 

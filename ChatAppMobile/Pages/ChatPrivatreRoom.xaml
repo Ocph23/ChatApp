@@ -5,10 +5,11 @@
              x:Class="ChatAppMobile.Pages.ChatPrivatreRoom"
              Shell.NavBarIsVisible="True" 
              BackgroundColor="#abbcea"
+             BackgroundImageSource="mobilebg1.jpg"
              Title="{Binding Title}">
 
-    <Grid RowDefinitions="10*,90*">
-        <HorizontalStackLayout Padding="20" BackgroundColor="#abbcea">
+    <Grid RowDefinitions="auto,*">
+        <HorizontalStackLayout Padding="10" Opacity="0.95" BackgroundColor="#abbcea">
             <Image VerticalOptions="Center">
                 <Image.Source>
                     <FontImageSource FontFamily="FASolid" Glyph="{StaticResource back}"
@@ -26,39 +27,34 @@
             </Frame>
             <Label Text="{Binding Teman.Nama}" TextColor="White" FontSize="Medium" VerticalOptions="Center" Margin="5,0"></Label>
         </HorizontalStackLayout>
-        <Border Grid.Row="1" StrokeShape="RoundRectangle 30 30 0 0" BackgroundColor="White">
-            <Grid RowDefinitions="*,auto" >
-                <CollectionView   Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="Single"
+        <Grid Grid.Row="1" RowDefinitions="*,auto" >
+            <CollectionView   Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="Single"
                SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                SelectionChangedCommand="{Binding SelectCommand}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <StackLayout>
-                                <conv:ChatView></conv:ChatView>
-                            </StackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                <Grid Padding="10" Grid.Row="1" >
-                    <Frame CornerRadius="20" Padding="0" BorderColor="Transparent" BackgroundColor="#f1eed4">
-                        <Grid ColumnDefinitions="auto,*,auto">
-                            <Button Command="{Binding FileCommand}" VerticalOptions="End" 
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout>
+                            <conv:ChatView></conv:ChatView>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Grid Padding="10" Grid.Row="1" >
+                <Frame CornerRadius="20" Padding="0" BorderColor="Transparent" Opacity="0.95" BackgroundColor="#f1eed4">
+                    <Grid ColumnDefinitions="auto,*,auto">
+                        <Button Command="{Binding FileCommand}" VerticalOptions="End" 
                                     CornerRadius="30" Grid.Column="0" Margin="5"  BackgroundColor="Transparent"
                                     FontFamily="FASolid" Text="&#xf0c6;" TextColor="DimGray" FontSize="20" Padding="10,0"
                                     HeightRequest="40" WidthRequest="40" ></Button>
-                            <Editor Grid.Column="1" Placeholder="Enter Message" AutoSize="TextChanges" Text="{Binding Message}"></Editor>
-                            <Button Command="{Binding SendCommand}" VerticalOptions="End" 
+                        <Editor Grid.Column="1" Placeholder="Enter Message" AutoSize="TextChanges" Text="{Binding Message}"></Editor>
+                        <Button Command="{Binding SendCommand}" VerticalOptions="End" 
                     CornerRadius="30" Grid.Column="2" Margin="5" 
                     FontFamily="FASolid" Text="&#xf1d8;" Padding="10,0"
                     HeightRequest="40" WidthRequest="40" ></Button>
 
-                        </Grid>
-                    </Frame>
-                </Grid>
+                    </Grid>
+                </Frame>
             </Grid>
-        </Border>
+        </Grid>
     </Grid>
-
-
-
 </ContentPage>

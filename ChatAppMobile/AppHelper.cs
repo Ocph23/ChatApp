@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatAppMobile.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ namespace ChatAppMobile
         public static async Task ShellDisplayError(string message)
         {
             await Shell.Current.DisplayAlert("Error", message, "Keluar");
+        }
+
+        internal static void Login()
+        {
+            Application.Current.MainPage = new LoginPage();
         }
 
         internal static async Task ShowMessage(string message)

@@ -84,7 +84,7 @@ public class ChatViewModel : BaseViewModel
             var service = ServiceHelper.GetService<IContactService>();
             ChatContact = await service.Get();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             throw;
         }

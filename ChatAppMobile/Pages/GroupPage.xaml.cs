@@ -74,7 +74,7 @@ public class GroupViewModel : BaseViewModel
     private void SelectCommandAction(object obj)
     {
         var group = obj as GroupDTO;
-        Shell.Current.Navigation.PushModalAsync(new Pages.ChatGroupRoom(group));
+        Shell.Current.Navigation.PushAsync(new Pages.ChatGroupRoom(group));
     }
 
     private async Task Load()

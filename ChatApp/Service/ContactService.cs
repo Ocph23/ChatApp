@@ -16,21 +16,24 @@ namespace ChatApp.Service
         {
             this.dbcontext = dbcontext;
         }
-        public Task<bool> AddAnggota(int groupid, string userId)
+        public Task<TemanDTO> AddAnggota(int groupid, string email)
         {
             try
             {
-                var newAnggota = dbcontext.Users.FirstOrDefault(x => x.Id == userId);
+                var newAnggota = dbcontext.Users.FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
                 ArgumentNullException.ThrowIfNull(newAnggota, "Calon Anggota Tidak Ditemuka.");
-                var group = dbcontext.Group.Include(x => x.Anggota).SingleOrDefault(x => x.Id == groupid);
+                var group = dbcontext.Group.Include(x => x.Anggota.Where(x=>x.Anggota.Id==newAnggota.Id)).SingleOrDefault(x => x.Id == groupid);
                 ArgumentNullException.ThrowIfNull(group, "Data Group Tidak Ditemukan. ");
+                if(group.Anggota.Count>0)
+                {
+                    throw new SystemException("User Sudah Menjadi Anggota");
+                }
                 group.Anggota.Add(new AnggotaGroup { Anggota = newAnggota, Keanggotaan = KeanggotaanGroup.Anggota, TanggalBergabung = DateTime.Now.ToUniversalTime() });
                 dbcontext.SaveChanges();
-                return Task.FromResult(true);
+                return Task.FromResult(new TemanDTO { TemanId = newAnggota.Id, Email = newAnggota.Email, Nama = newAnggota.Name});
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

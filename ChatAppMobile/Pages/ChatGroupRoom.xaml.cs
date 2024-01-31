@@ -8,6 +8,7 @@ using Shared.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Collections.Generic;
+using ChatAppMobile.Services;
 
 namespace ChatAppMobile.Pages;
 
@@ -93,7 +94,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
         });
 
         AddMemberCommand = new Command(AddMemberAction);
-        FileCommand = new Command(async(x)=> FileCommandAction(x));
+        FileCommand = new Command(async (x) => FileCommandAction(x));
         BackCommand = new Command(BackCommandAction);
         SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
         Group = group;
@@ -117,23 +118,51 @@ public class ChatGroupRoomViewModel : BaseViewModel
     private async Task FileCommandAction(object obj)
     {
         string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery", "Camera");
-        if(!string.IsNullOrEmpty(action))
+        if (!string.IsNullOrEmpty(action))
         {
-            if(action == "Galery")
+            if (action == "Galery")
             {
                 try
                 {
                     var result = await FilePicker.Default.PickAsync(new PickOptions());
                     if (result != null)
                     {
+
+                        // pdf, xlx, xlsx, doc, docx, jpg dan pptx p
+
                         if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
-                            result.FileName.EndsWith("png", StringComparison.OrdinalIgnoreCase))
+                            result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("docx", StringComparison.OrdinalIgnoreCase) ||
+                           result.FileName.EndsWith("ppt", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("pptx", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("pdf", StringComparison.OrdinalIgnoreCase))
                         {
                             using var stream = await result.OpenReadAsync();
                             using var memoryStream = new MemoryStream();
                             await stream.CopyToAsync(memoryStream);
-                            var data = memoryStream.ToArray();  
+                            var data = memoryStream.ToArray();
                             var image = ImageSource.FromStream(() => stream);
+
+                            var content = new MultipartFormDataContent();
+                            content.Add(new StreamContent(await result.OpenReadAsync()), "file", result.FileName);
+                            IFileServices fileService = ServiceHelper.GetService<IFileServices>();
+                            string fileName = await fileService.UploadGroupFile(Group.Id, content);
+                            if (!string.IsNullOrEmpty(fileName))
+                            {
+                                var messageService = ServiceHelper.GetService<IMessageService>();
+                                var item = new MessageGroup { MessageType = MessageType.File, UrlFile = fileName , GroupId=Group.Id, Tanggal=DateTime.Now, PengirimId=MyId};
+                                item.IsMe = item.PengirimId == MyId;
+                                Messages.Add(item);
+                                if (!item.IsMe)
+                                {
+                                    item.Status = MessageStatus.Baca;
+                                }
+                                var resultx = await messageService.PostGroupMessage(item);
+                                OnAddItem?.Invoke(Messages.Last(), null);
+                                return;
+                            }
                         }
                     }
                     return;
@@ -200,7 +229,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
 
     private async Task SendCommandAction(object obj)
     {
-        var message = new MessageGroup { PengirimId = MyId, IsMe = true, MessageType = MessageType.Text, Tanggal = DateTime.Now, Text = Message, GroupId=Group.Id};
+        var message = new MessageGroup { PengirimId = MyId, IsMe = true, MessageType = MessageType.Text, Tanggal = DateTime.Now, Text = Message, GroupId = Group.Id };
         WeakReferenceMessenger.Default.Send(new GroupSendMessageChange(message));
         Messages.Add(message);
         OnAddItem?.Invoke(message, null);

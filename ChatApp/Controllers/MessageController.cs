@@ -40,7 +40,7 @@ namespace ChatApp
             try
             {
                 var data = await messageService.GetPrivateMessage(userid1,userid2);
-                return Ok(data);
+                return Ok(data.OrderBy(x=>x.Tanggal));
             }
             catch (Exception ex)
             {

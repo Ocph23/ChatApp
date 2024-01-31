@@ -6,7 +6,7 @@ namespace Shared
     public class Helper
     {
 
-        public static string ServerURL => "https://39ch7501-7148.asse.devtunnels.ms";
+        public static string ServerURL => "https://mk8d7r9p-7148.asse.devtunnels.ms";
       //  public static string ServerURL => "https://localhost:7148";
         public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 

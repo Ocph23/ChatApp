@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls.Shapes;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -90,6 +91,25 @@ namespace ChatAppMobile.Converters
         {
             bool isMe = (bool)value!;
             return !isMe ? 0 : 1;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+
+    public class MessageTypeConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            MessageType valueType = (MessageType)value!;
+            MessageType paramType = (MessageType)parameter!;
+            if (valueType == paramType)
+                return true;
+            return false;
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

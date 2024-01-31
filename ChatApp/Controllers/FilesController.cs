@@ -60,6 +60,44 @@ namespace ChatApp.Controllers
             return Ok($"File {prefix}/{fileName} uploaded to S3 successfully!");
         }
 
+        [HttpPost("uploadgroupfile")]
+        public async Task<IActionResult> UploadGroupFileAsync(int groupid, IFormFile file)
+        {
+            string? prefix = "";
+            string fileName = System.IO.Path.GetRandomFileName() + "." + file.FileName.Split(".")[1];
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
+            var request = new PutObjectRequest()
+            {
+                BucketName = bucketName,
+                Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
+                InputStream = file.OpenReadStream()
+            };
+            request.Metadata.Add("Content-Type", file.ContentType);
+            await _s3Client.PutObjectAsync(request);
+            return Ok($"{prefix}/{fileName}");
+        }
+
+        [HttpPost("uploadprivatefile")]
+        public async Task<IActionResult> UploadPrivateFileAsync(string temainId, IFormFile file)
+        {
+            string? prefix = "";
+            string fileName = System.IO.Path.GetRandomFileName() + "." + file.FileName.Split(".")[1];
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
+            var request = new PutObjectRequest()
+            {
+                BucketName = bucketName,
+                Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
+                InputStream = file.OpenReadStream()
+            };
+            request.Metadata.Add("Content-Type", file.ContentType);
+            await _s3Client.PutObjectAsync(request);
+            return Ok($"{prefix}/{fileName}");
+        }
+
+
+
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAllFilesAsync( string? prefix)
         {

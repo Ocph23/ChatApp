@@ -43,6 +43,7 @@ namespace ChatAppMobile
             services.AddScoped<ChatClient>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IContactService, ContactService>();
+            services.AddScoped<IFileServices, FileService>();
 
             return services;
         }

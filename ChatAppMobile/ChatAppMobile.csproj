@@ -60,6 +60,7 @@
 	  <None Remove="Resources\Fonts\Font Awesome 6 Brands-Regular-400.otf" />
 	  <None Remove="Resources\Fonts\Font Awesome 6 Free-Regular-400.otf" />
 	  <None Remove="Resources\Fonts\Font Awesome 6 Free-Solid-900.otf" />
+	  <None Remove="Resources\Images\download.png" />
 	  <None Remove="Resources\Images\mobilebg.jpg" />
 	  <None Remove="Resources\Images\mobilebg1.jpg" />
 	  <None Remove="Resources\Images\mobilebg2.jpg" />

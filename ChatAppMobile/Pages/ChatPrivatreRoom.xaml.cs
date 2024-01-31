@@ -1,5 +1,6 @@
 using ChatAppMobile.Messages;
 using ChatAppMobile.Models;
+using ChatAppMobile.Services;
 using ChatAppMobile.ViewModels;
 using CommunityToolkit.Mvvm.Messaging;
 using OcphApiAuth.Client;
@@ -50,7 +51,7 @@ public partial class ChatPrivatreRoom : ContentPage
             set { SetProperty(ref sendCommand, value); }
         }
 
-
+        public Command DownloadFileCommand { get; private set; }
 
         private string message;
 
@@ -85,9 +86,14 @@ public partial class ChatPrivatreRoom : ContentPage
                 }
             });
 
-            FileCommand = new Command(FileCommandAction);
+            FileCommand = new Command(async (x)=> await FileCommandAction(x));
             BackCommand = new Command(BackCommandAction);
             SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
+            DownloadFileCommand = new Command(async (x) => await DownloadFileCommandAction(x));
+          
+
+
+
             Title = teman.Nama;
             Teman = teman;
             this.PropertyChanged += (s, p) =>
@@ -100,6 +106,22 @@ public partial class ChatPrivatreRoom : ContentPage
 
             _ = LoadMessage();
         }
+
+        private Task DownloadFileCommandAction(object x)
+        {
+            try
+            {
+                var fileService = ServiceHelper.GetService<IFileServices>();
+                fileService.DownloadFile(x.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            throw new NotImplementedException();
+        }
+
         private async Task LoadMessage()
         {
             var authProviderService = ServiceHelper.GetService<OcphAuthStateProvider>();
@@ -127,10 +149,76 @@ public partial class ChatPrivatreRoom : ContentPage
             }
         }
 
-        private void FileCommandAction(object obj)
+        private async Task FileCommandAction(object obj)
         {
 
-            throw new NotImplementedException();
+            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery", "Camera");
+            if (!string.IsNullOrEmpty(action))
+            {
+                if (action == "Galery")
+                {
+                    try
+                    {
+                        var result = await FilePicker.Default.PickAsync(new PickOptions());
+                        if (result != null)
+                        {
+
+                            // pdf, xlx, xlsx, doc, docx, jpg dan pptx p
+
+                            if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("docx", StringComparison.OrdinalIgnoreCase) ||
+                               result.FileName.EndsWith("ppt", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("pptx", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("pdf", StringComparison.OrdinalIgnoreCase))
+                            {
+                                using var stream = await result.OpenReadAsync();
+                                using var memoryStream = new MemoryStream();
+                                await stream.CopyToAsync(memoryStream);
+                                var data = memoryStream.ToArray();
+                                var image = ImageSource.FromStream(() => stream);
+
+                                var content = new MultipartFormDataContent();
+                                content.Add(new StreamContent(await result.OpenReadAsync()), "file", result.FileName);
+                                IFileServices fileService = ServiceHelper.GetService<IFileServices>();
+                                string fileName = await fileService.UploadPrivateFile(Teman.TemanId, content);
+                                if (!string.IsNullOrEmpty(fileName))
+                                {
+                                    var messageService = ServiceHelper.GetService<IMessageService>();
+                                    var item = new MessagePrivate { Text=result.FileName, MessageType = MessageType.File, UrlFile = fileName, PenerimaId= Teman.TemanId, 
+                                        Tanggal = DateTime.Now, PengirimId = MyId };
+                                    item.IsMe = item.PengirimId == MyId;
+                                    Messages.Add(item);
+                                    if (!item.IsMe)
+                                    {
+                                        item.Status = MessageStatus.Baca;
+                                    }
+                                    var resultx = await messageService.PostPrivateMessage(item);
+                                    OnAddItem?.Invoke(Messages.Last(), null);
+                                    return;
+                                }
+                            }
+                        }
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        // The user canceled or something went wrong
+                    }
+                    return;
+                }
+
+
+
+                if (action == "Camera")
+                {
+
+
+                    return;
+                }
+            }
         }
 
         private void BackCommandAction(object obj)

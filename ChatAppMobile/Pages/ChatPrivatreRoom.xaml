@@ -35,39 +35,44 @@
             <Label Text="{Binding Teman.Nama}" TextColor="White" FontSize="Medium" VerticalOptions="Center" Margin="5,0"></Label>
         </HorizontalStackLayout>
         <Grid Grid.Row="1" RowDefinitions="*,auto" >
-            <CollectionView   Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="None"
+
+            <RefreshView IsRefreshing="{Binding IsBusy}">
+                <CollectionView    Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="None"
                SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                SelectionChangedCommand="{Binding SelectCommand}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
-                            <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
+                                <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"
          BackgroundColor="{Binding IsMe, Converter={StaticResource messageColorConverter}}"
          StrokeShape="{Binding IsMe, Converter={StaticResource messageBorderConverter}}">
-                                <StackLayout Margin="15" Padding="5,2">
-                                    <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.Text}, Converter={StaticResource messageTypeConverter}}">
-                                        <Label x:Name="textxx" Text="{Binding Text}"></Label>
-                                        <Label x:Name="date2x" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
-                                    </StackLayout>
-                                    <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.File}, Converter={StaticResource messageTypeConverter}}">
-                                        <Grid ColumnDefinitions="auto,*,auto">
-                                            <Label VerticalOptions="End" Grid.Column="0" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid"  Text="&#xf0c6;" 
-                            TextColor="DimGray" FontSize="20" Padding="10,0" HeightRequest="40" WidthRequest="40" ></Label>
-                                            <Label Grid.Column="1" x:Name="text1" Text="{Binding Text}"></Label>
+                                    <StackLayout Margin="15" Padding="5,2">
+                                        <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.Text}, Converter={StaticResource messageTypeConverter}}">
+                                            <Label x:Name="textxx" Text="{Binding Text}"></Label>
+                                            <Label x:Name="date2x" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
+                                        </StackLayout>
+                                        <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.File}, Converter={StaticResource messageTypeConverter}}">
+                                            <Grid ColumnDefinitions="auto,*,auto">
+                                                <Label VerticalOptions="End" Grid.Column="0" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid"  Text="&#xf0c6;" 
+                                                   TextColor="DimGray" FontSize="20" Padding="10,0" HeightRequest="40" WidthRequest="40" ></Label>
+                                                <Label Grid.Column="1" x:Name="text1" Text="{Binding Text}"></Label>
+                                                <Grid Grid.Column="2">
+                                                    <Button  HorizontalOptions="End" Command="{Binding Path=BindingContext.DownloadFileCommand, Source={Reference list}}" 
+                                                     CommandParameter="{Binding .}" VerticalOptions="End" 
+                                                     CornerRadius="30" Grid.Column="2" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid" Text="&#xf01a;"
+                                                     TextColor="DimGray" FontSize="30" Padding="10,0" ></Button>
+                                                </Grid>
+                                            </Grid>
+                                            <Label x:Name="date1" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
+                                        </StackLayout>
 
-                                            <Button  HorizontalOptions="End" Command="{Binding Path=BindingContext.DownloadFileCommand, Source={Reference list}}" CommandParameter="{Binding UrlFile}" VerticalOptions="End" 
-                            CornerRadius="30" Grid.Column="2" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid" Text="&#xf01a;"
-                            TextColor="DimGray" FontSize="30" Padding="10,0" ></Button>
-                                        </Grid>
-                                        <Label x:Name="date1" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
                                     </StackLayout>
-
-                                </StackLayout>
-                            </Border>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
             <Grid Padding="10" Grid.Row="1" >
                 <Frame CornerRadius="20" Padding="0" BorderColor="Transparent" Opacity="0.95" BackgroundColor="#f1eed4">
                     <Grid ColumnDefinitions="auto,*,auto">

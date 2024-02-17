@@ -3,6 +3,8 @@ using Amazon.S3.Model;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
+using System.Drawing.Imaging;
 
 namespace ChatApp.Controllers
 {
@@ -46,7 +48,7 @@ namespace ChatApp.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFileAsync(IFormFile file, string? prefix)
         {
-            string fileName = System.IO.Path.GetRandomFileName() +"."+ file.FileName.Split(".")[1];
+            string fileName = System.IO.Path.GetRandomFileName() + "." + file.FileName.Split(".")[1];
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
             var request = new PutObjectRequest()
@@ -84,12 +86,19 @@ namespace ChatApp.Controllers
             string? prefix = "";
             string fileName = System.IO.Path.GetRandomFileName() + "." + file.FileName.Split(".")[1];
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-            if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
+            if (!bucketExists)
+                return NotFound($"Bucket {bucketName} does not exist.");
+
+            var dataFile = Helper.GetStreamData(file.OpenReadStream());
+            //Encript
+
+          //  var dataEncript = Helper.Encrypt(dataFile, "PJC7HnliwcxXw4FM8Ep3sX9NIL3R5CZnDvp8IyyCSlg=");
+
             var request = new PutObjectRequest()
             {
                 BucketName = bucketName,
                 Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
-                InputStream = file.OpenReadStream()
+                InputStream = new MemoryStream(dataFile)
             };
             request.Metadata.Add("Content-Type", file.ContentType);
             await _s3Client.PutObjectAsync(request);
@@ -99,7 +108,7 @@ namespace ChatApp.Controllers
 
 
         [HttpGet("get-all")]
-        public async Task<IActionResult> GetAllFilesAsync( string? prefix)
+        public async Task<IActionResult> GetAllFilesAsync(string? prefix)
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
@@ -122,19 +131,30 @@ namespace ChatApp.Controllers
             return Ok(s3Objects);
         }
 
-        [HttpGet("get-by-key")]
+        [HttpGet("getbykey")]
         public async Task<IActionResult> GetFileByKeyAsync(string key)
         {
-            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-            if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
-            var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
-            return File(s3Object.ResponseStream, s3Object.Headers.ContentType);
+            try
+            {
+                var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+                if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
+                var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
+
+                using MemoryStream ms = new MemoryStream();
+                s3Object.ResponseStream.CopyTo(ms);
+                var dataDecrypt = Helper.Decrypt(ms.ToArray(), "PJC7HnliwcxXw4FM8Ep3sX9NIL3R5CZnDvp8IyyCSlg=");
+                return File(dataDecrypt, s3Object.Headers.ContentType);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
 
 
         [HttpGet("get-url")]
-        public async Task<IActionResult> GetUrlFileAsync(string? prefix,string key)
+        public async Task<IActionResult> GetUrlFileAsync(string? prefix, string key)
         {
             var urlRequest = new GetPreSignedUrlRequest()
             {

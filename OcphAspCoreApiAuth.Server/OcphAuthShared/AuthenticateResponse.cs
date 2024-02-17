@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace OcphApiAuth
 {
-    public record AuthenticateResponse(string UserName, string Email, string Token);
+    public record AuthenticateResponse(string UserName, string Email, string Token, string PublicKey);
 }

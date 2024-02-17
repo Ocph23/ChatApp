@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace ChatAppMobile.Messages
 {
+
+    public class RequestPublicKey : ValueChangedMessage<MessageRequestPublicKey>
+    {
+        public RequestPublicKey(MessageRequestPublicKey model):base(model)
+        {
+            
+        }
+    }
+
     internal class PrivateMessageChange :ValueChangedMessage<MessagePrivate>
     {
         public PrivateMessageChange(MessagePrivate model) : base(model)

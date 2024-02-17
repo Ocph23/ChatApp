@@ -47,6 +47,7 @@ public partial class LoginPage : ContentPage
                     Preferences.Set("token", result.Token);
                     Preferences.Set("email", result.Email);
                     Preferences.Set("userName", result.UserName);
+                    Preferences.Set("publicKey", result.PublicKey);
                     Application.Current.MainPage = new AppShell();
                 }
             }

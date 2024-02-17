@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
 
 namespace OcphApiAuth
 {
@@ -34,7 +37,8 @@ namespace OcphApiAuth
                     ArgumentNullException.ThrowIfNull(user);
                     var roles = await userManager.GetRolesAsync(user);
                     var token = await user.GenerateToken(_appSettings, roles);
-                    return new AuthenticateResponse(userName!, userName!, token);
+                    var  publicKey = user.GetType().GetProperty("PublicKey").GetValue(user, null);
+                    return new AuthenticateResponse(userName!, userName!, token, publicKey==null?string.Empty:publicKey.ToString() );
 
                 }
                 throw new SystemException($"Your Account {userName} Not Have Access !");
@@ -58,10 +62,12 @@ namespace OcphApiAuth
                         await userManager.AddToRoleAsync(user, role);
                     }
                     var token = await user.GenerateToken(_appSettings, new List<string> { role });
-
                     var userResult = user as IdentityUser;
 
-                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token);
+                    
+
+                    var publicKey = userResult.GetType().GetProperty("PublicKey").GetValue(userResult, null);
+                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token, publicKey.ToString());
                 }
 
                 string errorMessage = string.Empty;

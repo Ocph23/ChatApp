@@ -6,9 +6,13 @@ public class ApplicationUser : IdentityUser
     {
     }
 
-    public ApplicationUser(){}
+    public ApplicationUser() { }
 
     public string? Name { get; set; }
+
+    public string? PrivateKey { get; set; }
+
+    public string? PublicKey { get; set; }
 
     public string? Photo { get; set; }
 }

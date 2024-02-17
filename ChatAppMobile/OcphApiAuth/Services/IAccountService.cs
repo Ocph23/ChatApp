@@ -11,5 +11,6 @@ namespace OcphApiAuth.Client
         Task Logout();
         Task<UserDTO> GetProfile();
         Task<bool> UpdateUser(UserDTO user);
+        Task<string> RequestPublicKey(string? temanId);
     }
 }

@@ -35,4 +35,12 @@ namespace Shared
         public int GroupId { get; set; }
 
     }
+
+
+    public class MessageRequestPublicKey
+    {
+       public string PublicKey { get; set; }
+
+
+    }
 }

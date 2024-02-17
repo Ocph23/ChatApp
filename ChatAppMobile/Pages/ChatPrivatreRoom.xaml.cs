@@ -7,6 +7,10 @@ using OcphApiAuth.Client;
 using Shared;
 using Shared.Contracts;
 using System.Collections.ObjectModel;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ChatAppMobile.Pages;
 
@@ -24,8 +28,8 @@ public partial class ChatPrivatreRoom : ContentPage
     private void ViewModels_OnAddItem(object? sender, EventArgs e)
     {
         var message = sender as MessagePrivate;
-        list.ScrollTo(message, ScrollToPosition.End);
-    }   
+        list.ScrollTo(message, ScrollToPosition.MakeVisible);
+    }
 
     public class ChatPrivateRoomViewModel : BaseViewModel
     {
@@ -77,6 +81,7 @@ public partial class ChatPrivatreRoom : ContentPage
                         if (!Messages.Any(x => x.Id == data.Id))
                         {
                             Messages.Add(data);
+                            await Task.Delay(500);
                             OnAddItem?.Invoke(data, new EventArgs());
                         }
                     }
@@ -86,11 +91,11 @@ public partial class ChatPrivatreRoom : ContentPage
                 }
             });
 
-            FileCommand = new Command(async (x)=> await FileCommandAction(x));
+            FileCommand = new Command(async (x) => await FileCommandAction(x));
             BackCommand = new Command(BackCommandAction);
             SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
             DownloadFileCommand = new Command(async (x) => await DownloadFileCommandAction(x));
-          
+
 
 
 
@@ -107,45 +112,56 @@ public partial class ChatPrivatreRoom : ContentPage
             _ = LoadMessage();
         }
 
-        private Task DownloadFileCommandAction(object x)
+        private async Task DownloadFileCommandAction(object x)
         {
             try
             {
+                var message = x as Message;
                 var fileService = ServiceHelper.GetService<IFileServices>();
-                fileService.DownloadFile(x.ToString());
+                await fileService.DownloadFile(message);
             }
             catch (Exception ex)
             {
-
-                throw;
+                await AppShell.Current.DisplayAlert("Error", ex.Message, "OK");
             }
-            throw new NotImplementedException();
         }
 
         private async Task LoadMessage()
         {
-            var authProviderService = ServiceHelper.GetService<OcphAuthStateProvider>();
-            MyId = await authProviderService.GetUserId();
-            CurrentRoom = new ChatRoom(Teman);
-            var service = ServiceHelper.GetService<IMessageService>();
-            var messgaes = await service.GetPrivateMessage(Teman.TemanId, MyId);
-            foreach (var item in messgaes)
+            try
             {
-                item.IsMe = item.PengirimId == MyId;
-                Messages.Add(item);
-                if (!item.IsMe)
+                IsBusy = true;
+                var authProviderService = ServiceHelper.GetService<OcphAuthStateProvider>();
+                MyId = await authProviderService.GetUserId();
+                CurrentRoom = new ChatRoom(Teman);
+                var service = ServiceHelper.GetService<IMessageService>();
+                var messgaes = await service.GetPrivateMessage(Teman.TemanId, MyId);
+                foreach (var item in messgaes)
                 {
-                    item.Status = MessageStatus.Baca;
+                    item.IsMe = item.PengirimId == MyId;
+                    Messages.Add(item);
+                    if (!item.IsMe)
+                    {
+                        item.Status = MessageStatus.Baca;
+                    }
+                }
+                OnAddItem?.Invoke(Messages.Last(), null);
+                var readed = await service.ReadMassage(Teman.TemanId, MyId);
+                if (readed)
+                {
+                    foreach (var item in Teman.Messages)
+                    {
+                        item.Status = MessageStatus.Baca;
+                    }
                 }
             }
-            OnAddItem?.Invoke(Messages.Last(), null);
-            var readed = await service.ReadMassage(Teman.TemanId, MyId);
-            if (readed)
+            catch (Exception ex)
             {
-                foreach (var item in Teman.Messages)
-                {
-                    item.Status = MessageStatus.Baca;
-                }
+              await  Shell.Current.DisplayAlert("Error",ex.Message,"Ok");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -174,21 +190,38 @@ public partial class ChatPrivatreRoom : ContentPage
                                 result.FileName.EndsWith("pptx", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("pdf", StringComparison.OrdinalIgnoreCase))
                             {
+
                                 using var stream = await result.OpenReadAsync();
                                 using var memoryStream = new MemoryStream();
                                 await stream.CopyToAsync(memoryStream);
                                 var data = memoryStream.ToArray();
-                                var image = ImageSource.FromStream(() => stream);
+
+                                //Encript 
+
+                                var accountService = ServiceHelper.GetService<IAccountService>();
+                                var recivePublicKeyString = await accountService.RequestPublicKey(Teman.TemanId);
+
+                                
+                                var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
+
+                                var dataEncript = Helper.Encrypt(data, shardingKey);
 
                                 var content = new MultipartFormDataContent();
-                                content.Add(new StreamContent(await result.OpenReadAsync()), "file", result.FileName);
+                                content.Add(new StreamContent(new MemoryStream(dataEncript)), "file", result.FileName);
                                 IFileServices fileService = ServiceHelper.GetService<IFileServices>();
                                 string fileName = await fileService.UploadPrivateFile(Teman.TemanId, content);
                                 if (!string.IsNullOrEmpty(fileName))
                                 {
                                     var messageService = ServiceHelper.GetService<IMessageService>();
-                                    var item = new MessagePrivate { Text=result.FileName, MessageType = MessageType.File, UrlFile = fileName, PenerimaId= Teman.TemanId, 
-                                        Tanggal = DateTime.Now, PengirimId = MyId };
+                                    var item = new MessagePrivate
+                                    {
+                                        Text = result.FileName,
+                                        MessageType = MessageType.File,
+                                        UrlFile = fileName,
+                                        PenerimaId = Teman.TemanId,
+                                        Tanggal = DateTime.Now,
+                                        PengirimId = MyId
+                                    };
                                     item.IsMe = item.PengirimId == MyId;
                                     Messages.Add(item);
                                     if (!item.IsMe)
@@ -196,6 +229,7 @@ public partial class ChatPrivatreRoom : ContentPage
                                         item.Status = MessageStatus.Baca;
                                     }
                                     var resultx = await messageService.PostPrivateMessage(item);
+                                    WeakReferenceMessenger.Default.Send(new PrivateSendMessageChange(item));
                                     OnAddItem?.Invoke(Messages.Last(), null);
                                     return;
                                 }

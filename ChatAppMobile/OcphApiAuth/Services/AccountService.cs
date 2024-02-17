@@ -87,6 +87,23 @@ namespace OcphApiAuth.Client
             }
         }
 
+        public async Task<string> RequestPublicKey(string? temanId)
+        {
+            try
+            {
+                var response = await httpClient.GetAsync($"api/account/publickey/{temanId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
         public async Task<bool> UpdateUser(UserDTO user)
         {
             try

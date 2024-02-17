@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using static System.Net.Mime.MediaTypeNames;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -45,6 +47,13 @@ namespace ChatApp
             try
             {
                 var user = new ApplicationUser(value.Email) { Email = value.Email, EmailConfirmed = true, Name = value.Name };
+                using (ECDiffieHellmanCng alice = new ECDiffieHellmanCng())
+                {
+
+                    alice.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+                    alice.HashAlgorithm = CngAlgorithm.Sha256;
+                    user.PublicKey = Convert.ToBase64String(alice.PublicKey.ToByteArray());
+                }
                 var response = await accountService.Register(user, value.Role, value.Password);
                 ArgumentNullException.ThrowIfNull(response);
                 return Ok(response);
@@ -68,6 +77,21 @@ namespace ChatApp
             catch (Exception ex)
             {
                 return Unauthorized(ex.Message);
+            }
+        }
+
+        [HttpGet("publickey/{id}")]
+        public async Task<ActionResult> GetPublicKey(string id)
+        {
+            try
+            {
+                var user = await accountService.FindUserById(id);
+                ArgumentNullException.ThrowIfNull(user);
+                return Ok(user.PublicKey);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 

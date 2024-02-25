@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ChatAppMobile;
+using Microsoft.AspNetCore.Mvc;
 using OcphApiAuth;
 using Shared;
 using System.Drawing;
@@ -31,7 +32,7 @@ namespace ChatApp
         {
             try
             {
-                var response = await accountService.Login(value.UserName, value.Password);
+                AuthenticateResponse response = await accountService.Login(value.UserName, value.Password);
                 ArgumentNullException.ThrowIfNull(response);
                 return Ok(response);
             }
@@ -46,15 +47,8 @@ namespace ChatApp
         {
             try
             {
-                var user = new ApplicationUser(value.Email) { Email = value.Email, EmailConfirmed = true, Name = value.Name };
-                using (ECDiffieHellmanCng alice = new ECDiffieHellmanCng())
-                {
-
-                    alice.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-                    alice.HashAlgorithm = CngAlgorithm.Sha256;
-                    user.PublicKey = Convert.ToBase64String(alice.PublicKey.ToByteArray());
-                }
-                var response = await accountService.Register(user, value.Role, value.Password);
+                var user = new ApplicationUser(value.Email) { Email = value.Email, EmailConfirmed = true, Name = value.Name, PrivateKey = value.PrivateKey };
+                AuthenticateResponse response = await accountService.Register(user, value.Role, value.Password);
                 ArgumentNullException.ThrowIfNull(response);
                 return Ok(response);
             }
@@ -87,7 +81,14 @@ namespace ChatApp
             {
                 var user = await accountService.FindUserById(id);
                 ArgumentNullException.ThrowIfNull(user);
-                return Ok(user.PublicKey);
+
+                unsafe
+                {
+                    byte[] privateKey = Convert.FromBase64String(user.PrivateKey);
+                    byte[]* publicKey = &privateKey;
+                    var publicKeyString = ECCShare.GetPublicKey(publicKey);
+                    return Ok(Convert.ToBase64String(publicKeyString));
+                }
             }
             catch (Exception ex)
             {

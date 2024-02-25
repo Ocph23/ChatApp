@@ -159,9 +159,8 @@ namespace ChatApp.Service
                     contact.Friends = temans.ToList();
                 }
 
-                var anggotaGroup = from x in dbcontext.Group.Include(x => x.Anggota)
-                                   .ThenInclude(x => x.Anggota).SelectMany(x => x.Anggota).Where(x => x.Anggota.Id == userid)
-                                   select x;
+                var anggotaGroup = dbcontext.AnggotaGroup.Include(x=>x.Anggota).Where(x=>x.Anggota.Id==userid);
+
 
                 var group = from a in anggotaGroup
                             join g in dbcontext.Group.Include(x => x.Pembuat) on a.GroupId equals g.Id

@@ -16,6 +16,10 @@ namespace ChatAppMobile
 
 
             //var xxx = ECC.GetPublicKey();
+            //var base64 = Convert.ToBase64String(xxx);
+            //var xxr = Convert.FromBase64String(base64);
+            
+            
             //var xxxxxx = ECC.GetSharderKey(xxx);
 
             string? token = Preferences.Get("token", string.Empty);

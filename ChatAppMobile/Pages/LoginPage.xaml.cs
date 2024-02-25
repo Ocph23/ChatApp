@@ -47,9 +47,11 @@ public partial class LoginPage : ContentPage
                     Preferences.Set("token", result.Token);
                     Preferences.Set("email", result.Email);
                     Preferences.Set("userName", result.UserName);
-                    Preferences.Set("publicKey", result.PublicKey);
+                    Preferences.Set("privateKey", result.PrivateKey);
                     Application.Current.MainPage = new AppShell();
+                    return;
                 }
+                throw new UnauthorizedAccessException("UserName atau Password Anda Salah");
             }
             catch (Exception ex)
             {
@@ -88,7 +90,7 @@ public partial class LoginPage : ContentPage
 
 
 
-        private string? userName = "admin@gmail.com";
+        private string? userName = "ocph23@gmail.com";
 
         public string? UserName
         {
@@ -97,7 +99,7 @@ public partial class LoginPage : ContentPage
         }
 
 
-        private string? password = "Password@123";
+        private string? password = "Sony@77";
 
         public string? Password
         {

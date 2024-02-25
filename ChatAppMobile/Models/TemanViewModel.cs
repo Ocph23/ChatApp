@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ChatAppMobile.Models
 {
@@ -57,7 +58,18 @@ namespace ChatAppMobile.Models
             get { return photo; }
             set { SetProperty(ref photo, value); }
         }
+        public string NameView => string.IsNullOrEmpty(Nama) ? "NN" : GetNameView(Nama);
 
+        private string GetNameView(string name)
+        {
+            var nickName = name.Split(" ");
+            var sb = new StringBuilder();
+            foreach (var item in nickName)
+            {
+                sb.Append(item.Substring(0, 1));
+            }
+            return sb.ToString().ToUpper();
+        }
 
         private KeanggotaanGroup keanggotaan;
 

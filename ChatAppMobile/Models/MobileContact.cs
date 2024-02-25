@@ -18,6 +18,8 @@ namespace ChatAppMobile.Models
         public ICollection<GroupDTO>? Groups { get; set; } = new List<GroupDTO>();
         public string? Email { get; set; }
 
+      
+
         public MobileContact()
         {
 

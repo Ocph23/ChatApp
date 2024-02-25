@@ -44,10 +44,11 @@ public class RegisterViewModel : BaseViewModel
 
             IsBusy = true;
             var service = ServiceHelper.GetService<IAccountService>();
-            var result = await service.Register(new Client.OcphAuthClient.Models.RegisterRequest(UserName, Telepon, Password, ConfirmPassword, "User"));
+            var result = await service.Register(new Client.OcphAuthClient.Models.RegisterRequest(Name, UserName, Telepon, Password, ConfirmPassword, "User",Convert.ToBase64String(ECC.GeneratePrivateKey())));
             if (result != null)
             {
                 await AppHelper.ShowMessage("Berhasil !");
+                Application.Current.MainPage = new LoginPage();
             }
         }
         catch (Exception ex)

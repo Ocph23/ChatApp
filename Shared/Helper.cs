@@ -10,7 +10,7 @@ namespace Shared
     public class Helper
     {
 
-        public static string ServerURL => "https://dlrwt3db-7148.asse.devtunnels.ms";
+        public static string ServerURL => "https://w1vstpff-7148.asse.devtunnels.ms";
         //  public static string ServerURL => "https://localhost:7148";
         public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -50,24 +50,24 @@ namespace Shared
         }
 
 
-        public static byte[] Encrypt(byte[] data, byte[] _key)
-        {
-            if (CanPerformCryptography(data))
-            {
-                using (var aes = new AesManaged())
-                {
+        //public static byte[] Encrypt(byte[] data, byte[] _key)
+        //{
+        //    if (CanPerformCryptography(data))
+        //    {
+        //        using (var aes = new AesManaged())
+        //        {
 
-                    aes.Key = _key;
-                    aes.IV = null;
-                    using (var encryptor = aes.CreateEncryptor())
-                    {
-                        return PerformCryptography(encryptor, data);
-                    }
+        //            aes.Key = _key;
+        //            aes.IV = null;
+        //            using (var encryptor = aes.CreateEncryptor())
+        //            {
+        //                return PerformCryptography(encryptor, data);
+        //            }
 
-                }
-            }
-            return data;
-        }
+        //        }
+        //    }
+        //    return data;
+        //}
 
         private static bool CanPerformCryptography(byte[] data)
         {

@@ -37,8 +37,8 @@ namespace OcphApiAuth
                     ArgumentNullException.ThrowIfNull(user);
                     var roles = await userManager.GetRolesAsync(user);
                     var token = await user.GenerateToken(_appSettings, roles);
-                    var  publicKey = user.GetType().GetProperty("PublicKey").GetValue(user, null);
-                    return new AuthenticateResponse(userName!, userName!, token, publicKey==null?string.Empty:publicKey.ToString() );
+                    var  privateKey = user.GetType().GetProperty("PrivateKey").GetValue(user, null);
+                    return new AuthenticateResponse(userName!, userName!, token, privateKey==null?string.Empty:privateKey.ToString() );
 
                 }
                 throw new SystemException($"Your Account {userName} Not Have Access !");
@@ -64,10 +64,8 @@ namespace OcphApiAuth
                     var token = await user.GenerateToken(_appSettings, new List<string> { role });
                     var userResult = user as IdentityUser;
 
-                    
-
-                    var publicKey = userResult.GetType().GetProperty("PublicKey").GetValue(userResult, null);
-                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token, publicKey.ToString());
+                    var privateKey = userResult.GetType().GetProperty("PrivateKey").GetValue(userResult, null);
+                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token,privateKey.ToString());
                 }
 
                 string errorMessage = string.Empty;

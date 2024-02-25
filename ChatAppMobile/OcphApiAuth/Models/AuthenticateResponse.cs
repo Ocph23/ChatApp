@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Client.OcphAuthClient.Models
 {
-    public record AuthenticateResponse(string UserName, string Email, string Token, string PublicKey);
+    public record AuthenticateResponse(string UserName, string Email, string Token, string PrivateKey);
 }

@@ -24,6 +24,8 @@ public class ProfileViewModel : BaseViewModel
     {
         ChangeAvatarCommand = new Command( async(x) =>await ChangeAvatarCommandAction(x));
         UpdateCommand = new Command(UpdateAction, UpdateValidate);
+        LogoutCommand = new Command(LogOutAction);
+
         _ = Load();
         this.PropertyChanged += (o, p) =>
         {
@@ -33,6 +35,12 @@ public class ProfileViewModel : BaseViewModel
             }
         };
 
+    }
+
+    private void LogOutAction(object obj)
+    {
+        Preferences.Set("token", string.Empty);
+        Application.Current.MainPage = new LoginPage();  
     }
 
     private async void UpdateAction(object obj)
@@ -107,6 +115,7 @@ public class ProfileViewModel : BaseViewModel
         set { SetProperty(ref updateCommand , value); }
     }
 
+    public Command LogoutCommand { get; private set; }
 
     public Command ChangeAvatarCommand { get; private set; }
 

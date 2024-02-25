@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:conv ="clr-namespace:ChatAppMobile.Converters"
              x:Class="ChatAppMobile.Pages.ChatPrivatreRoom"
-               xmlns:shared ="clr-namespace:Shared;assembly=Shared"
+             xmlns:shared ="clr-namespace:Shared;assembly=Shared"
              Shell.NavBarIsVisible="True" 
              BackgroundColor="#abbcea"
              BackgroundImageSource="mobilebg1.jpg"
@@ -40,7 +40,7 @@
                 <CollectionView    Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="None"
                SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                SelectionChangedCommand="{Binding SelectCommand}">
-                    <CollectionView.ItemTemplate>
+                    <CollectionView.ItemTemplate> 
                         <DataTemplate>
                             <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
                                 <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"

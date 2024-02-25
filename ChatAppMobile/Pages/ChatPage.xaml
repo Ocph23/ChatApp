@@ -21,7 +21,7 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="0" Margin="2" BorderColor="Transparent"  Opacity="0.8">
+                    <Frame Padding="0" CornerRadius="10" Margin="2" BorderColor="Transparent"  Opacity="0.9">
                         <Frame.Background>
                             <LinearGradientBrush EndPoint="1,0">
                                 <GradientStop Color="#cfd9df"
@@ -31,7 +31,9 @@
                             </LinearGradientBrush>
                         </Frame.Background>
                         <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
-                            <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
+                            <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" Padding="0" WidthRequest="45" HeightRequest="45" CornerRadius="50">
+                                <Label FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding NameView}"></Label>
+                            </Frame>
                             <StackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label FontSize="Small" Text="{Binding Nama}"></Label>
                                 <Label FontSize="Micro" Text="{Binding Description}"></Label>

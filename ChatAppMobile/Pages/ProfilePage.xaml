@@ -9,6 +9,7 @@
             <Setter Property="Margin" Value="0,5"></Setter>
         </Style>
     </ContentPage.Resources>
+    <Grid RowDefinitions="*,auto">
     <VerticalStackLayout Padding="20" Margin="30" >
         <Grid WidthRequest="75" HeightRequest="75" HorizontalOptions="Center">
             <toolkit:AvatarView 
@@ -36,4 +37,6 @@
         </HorizontalStackLayout>
         <Button Margin="0,10" Text="Simpan"  Command="{Binding UpdateCommand}"></Button>
     </VerticalStackLayout>
+        <Button Grid.Row="1" Margin="10" Command="{Binding LogoutCommand}" Text="Logout"></Button>
+    </Grid>
 </ContentPage>

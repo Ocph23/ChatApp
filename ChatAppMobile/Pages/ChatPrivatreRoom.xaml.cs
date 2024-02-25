@@ -2,6 +2,8 @@ using ChatAppMobile.Messages;
 using ChatAppMobile.Models;
 using ChatAppMobile.Services;
 using ChatAppMobile.ViewModels;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
 using OcphApiAuth.Client;
 using Shared;
@@ -11,6 +13,7 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace ChatAppMobile.Pages;
 
@@ -116,13 +119,42 @@ public partial class ChatPrivatreRoom : ContentPage
         {
             try
             {
+                if(IsBusy)
+                    return;
+                IsBusy = true;
                 var message = x as Message;
                 var fileService = ServiceHelper.GetService<IFileServices>();
-                await fileService.DownloadFile(message);
+                var response = await fileService.DownloadFile(message);
+
+                var cancellationToken = new CancellationToken();
+                ///api / Files / uploadgroupfile ? groupid = 3
+                ///
+                var accountService = ServiceHelper.GetService<IAccountService>();
+                var recivePublicKeyString = await accountService.RequestPublicKey(Teman.TemanId);
+
+
+                var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
+
+                var dataEncript = Helper.Decrypt(response, shardingKey);
+
+                using var stream = new MemoryStream(dataEncript);
+                var fileSaverResult = await FileSaver.Default.SaveAsync(message.Text, stream, cancellationToken);
+                if (fileSaverResult.IsSuccessful)
+                {
+                    await Toast.Make($"The file was saved successfully to location: {fileSaverResult.FilePath}").Show(cancellationToken);
+                }
+                else
+                {
+                    await Toast.Make($"The file was not saved successfully with error: {fileSaverResult.Exception.Message}").Show(cancellationToken);
+                }
             }
             catch (Exception ex)
             {
                 await AppShell.Current.DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                IsBusy=false;
             }
         }
 

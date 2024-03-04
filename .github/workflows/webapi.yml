@@ -13,19 +13,19 @@ jobs:
       - name : Check Out Code
         uses : actions/checkout@v2
 
-      - name : Setup .net 5
+      - name : Setup .net 8
         uses : actions/setup-dotnet@v1
         with: 
-          dotnet-version: '5.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore "ApsWebApp/ApsWebApp.csproj"
+        run: dotnet restore "ChatApp/ChatApp.csproj"
 
       - name: Build app
-        run: dotnet build "ApsWebApp/ApsWebApp.csproj" -c Release --no-restore
+        run: dotnet build "ChatApp/ChatApp.csproj" -c Release --no-restore
 
       - name: Publish App
-        run: dotnet publish "ApsWebApp/ApsWebApp.csproj" -c Release -o ./aps
+        run: dotnet publish "ChatApp/ChatApp.csproj" -c Release -o ./aps
 
 
       - name: Copy To VPS

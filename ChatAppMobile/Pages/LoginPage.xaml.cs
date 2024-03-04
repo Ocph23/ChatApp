@@ -1,6 +1,7 @@
 using ChatAppMobile.Validator;
 using ChatAppMobile.ViewModels;
 using OcphApiAuth.Client;
+using Shared;
 
 namespace ChatAppMobile.Pages;
 
@@ -87,9 +88,6 @@ public partial class LoginPage : ContentPage
             set { SetProperty(ref registerCommand, value); }
         }
 
-
-
-
         private string? userName = "ocph23@gmail.com";
 
         public string? UserName
@@ -98,7 +96,6 @@ public partial class LoginPage : ContentPage
             set { SetProperty(ref userName, value); }
         }
 
-
         private string? password = "Sony@77";
 
         public string? Password
@@ -106,5 +103,13 @@ public partial class LoginPage : ContentPage
             get { return password; }
             set { SetProperty(ref password, value); }
         }
+
+        private string url = Helper.ServerURL;
+        public string URL
+        {
+            get { return  url; }
+            set { SetProperty(ref url , value); }
+        }
+
     }
 }

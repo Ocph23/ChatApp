@@ -1,6 +1,7 @@
 using ChatAppMobile.Validator;
 using ChatAppMobile.ViewModels;
 using OcphApiAuth.Client;
+using Shared;
 
 namespace ChatAppMobile.Pages;
 
@@ -140,7 +141,12 @@ public class RegisterViewModel : BaseViewModel
 
 
 
-
+    private string url = Helper.ServerURL;
+    public string URL
+    {
+        get { return url; }
+        set { SetProperty(ref url, value); }
+    }
 
 
 }

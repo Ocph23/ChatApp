@@ -1,0 +1,58 @@
+name: aps CI
+
+on:
+  push:
+    branches: [ "web" ]
+  pull_request:
+    branches: [ "web" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps: 
+      - name : Check Out Code
+        uses : actions/checkout@v2
+
+      - name : Setup .net 5
+        uses : actions/setup-dotnet@v1
+        with: 
+          dotnet-version: '5.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore "ApsWebApp/ApsWebApp.csproj"
+
+      - name: Build app
+        run: dotnet build "ApsWebApp/ApsWebApp.csproj" -c Release --no-restore
+
+      - name: Publish App
+        run: dotnet publish "ApsWebApp/ApsWebApp.csproj" -c Release -o ./aps
+
+
+      - name: Copy To VPS
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+        with:
+          source: "./aps"
+          target: "/var/www"
+          
+      - name: cmod
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+          script: chmod -R 777 /var/www/aps    
+
+      - name: Run Kestrel Service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+          script: systemctl restart kestrel-aps.service

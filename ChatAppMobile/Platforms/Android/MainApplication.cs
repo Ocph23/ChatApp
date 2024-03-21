@@ -3,14 +3,14 @@ using Android.Runtime;
 using static Java.Util.Jar.Attributes;
 
 
-[assembly: UsesPermission(Android.Manifest.Permission.ReadExternalStorage, MaxSdkVersion = 32)]
+[assembly: UsesPermission(Android.Manifest.Permission.ReadExternalStorage)]
 [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaAudio)]
 [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaImages)]
 [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaVideo)]
 
 // Needed for Taking photo/video
 [assembly: UsesPermission(Android.Manifest.Permission.Camera)]
-[assembly: UsesPermission(Android.Manifest.Permission.WriteExternalStorage, MaxSdkVersion = 32)]
+[assembly: UsesPermission(Android.Manifest.Permission.WriteExternalStorage)]
 
 
 

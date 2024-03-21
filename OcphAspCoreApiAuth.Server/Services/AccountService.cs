@@ -35,13 +35,19 @@ namespace OcphApiAuth
                 {
                     T? user = await userManager.FindByEmailAsync(userName.ToUpper());
                     ArgumentNullException.ThrowIfNull(user);
+                    var identity = user as IdentityUser;
+                    if (!identity.EmailConfirmed)
+                        throw new SystemException("Akun Anda Di Blokir , Silahkan Hubungi Administrator");
                     var roles = await userManager.GetRolesAsync(user);
                     var token = await user.GenerateToken(_appSettings, roles);
-                    var  privateKey = user.GetType().GetProperty("PrivateKey").GetValue(user, null);
-                    return new AuthenticateResponse(userName!, userName!, token, privateKey==null?string.Empty:privateKey.ToString() );
-
+                    var privateKey = user.GetType().GetProperty("PrivateKey").GetValue(user, null);
+                    return new AuthenticateResponse(userName!, userName!, token, privateKey == null ? string.Empty : privateKey.ToString());
                 }
-                throw new SystemException($"Your Account {userName} Not Have Access !");
+
+                if (result.IsNotAllowed)
+                    throw new SystemException("Akun Anda Di Blokir , Silahkan Hubungi Administrator");
+                else
+                    throw new SystemException($"Your Account {userName} Not Have Access !");
             }
             catch (System.Exception ex)
             {
@@ -65,7 +71,7 @@ namespace OcphApiAuth
                     var userResult = user as IdentityUser;
 
                     var privateKey = userResult.GetType().GetProperty("PrivateKey").GetValue(userResult, null);
-                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token,privateKey.ToString());
+                    return new AuthenticateResponse(userResult.UserName, userResult.Email, token, privateKey.ToString());
                 }
 
                 string errorMessage = string.Empty;

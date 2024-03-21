@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
+using OcphApiAuth.Client;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -82,7 +83,7 @@ namespace ChatAppMobile.Services
                     return stringContent;
                 }
                 else
-                    throw new SystemException("Gagal Upload File");
+                    throw new SystemException(await response.Error());
             }
             catch (Exception ex)
             {

@@ -12,6 +12,7 @@ namespace Shared
         public DateTime Created { get; set; }
         public string? Owner { get; set; }
         public IEnumerable<TemanDTO> Anggota { get; set; } = Enumerable.Empty<TemanDTO>();
+        public int JumlahAnggota { get; set; }
 
         public void AddMessage(MessageGroup value)
         {

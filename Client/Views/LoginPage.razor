@@ -4,27 +4,50 @@
 @using OcphApiAuth;
 @using OcphApiAuth.Client;
 @using OcphApiAuth.Client.Validators;
-    using Client.OcphAuthClient.Models;
+@using Client.OcphAuthClient.Models;
 
 @inject IAccountService accountService
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authStateProvider
 @inject ILocalStorageService localStorageService
+<div style="height:90vh;" class="w-100 d-flex justify-content-center flex-column align-items-center">
+    <div class="col-md-5">
 
-<h1>Login</h1>
-<EditForm Model="loginRequest" OnValidSubmit="OnValidSubmitAction">
-    <InputText @bind-Value="loginRequest.UserName"></InputText>
-    <InputText @bind-Value="loginRequest.Password"></InputText>
-    <button type="submit">Login</button>
-</EditForm>
+        @if (showError)
+        {
+            <div class="alert alert-danger" role="alert">
+                @errorMessage
+            </div>
+        }
+        <h1>Login</h1>
+        <EditForm Model="loginRequest" OnValidSubmit="OnValidSubmitAction">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <InputText type="email" class="form-control" @bind-Value="loginRequest.UserName" placeholder="Enter email"></InputText>
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group mt-2">
+                <label for="exampleInputPassword1">Password</label>
+                <InputText type="password" class="form-control" @bind-Value="loginRequest.Password"></InputText>
+            </div>
+            <div class="form-group form-check mt-2">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        </EditForm>
+    </div>
 
+</div>
 @code {
+    bool showError = false;
     LoginRequest loginRequest = new LoginRequest();
-
+    string? errorMessage;
     async Task OnValidSubmitAction(EditContext context)
     {
         try
         {
+            showError = false;
             var result = await accountService.Login(loginRequest);
             if (result != null)
             {
@@ -34,38 +57,25 @@
                 await localStorageService.SetItemAsync("email", result.Email);
                 await authStateProvider.GetAuthenticationStateAsync();
 
-
-
-
                 var userProfider = await authStateProvider.GetAuthenticationStateAsync();
                 if (userProfider.User.IsInRole("Admin"))
                 {
-                    navigationManager.NavigateTo("/admin");
+                    navigationManager.NavigateTo("/");
                     return;
+                }
+                else
+                {
+                    await accountService.Logout();
+                    throw new SystemException("Maaf Anda Bukan Administrator");
                 }
 
-                if (userProfider.User.IsInRole("Diakonia"))
-                {
-                    navigationManager.NavigateTo("/Diakonia");
-                    return;
-                }
 
-                if (userProfider.User.IsInRole("Rayon"))
-                {
-                    navigationManager.NavigateTo("/rayon");
-                    return;
-                }
-
-                if (userProfider.User.IsInRole("Jemaat"))
-                {
-                    navigationManager.NavigateTo("/jemaat");
-                    return;
-                }
             }
         }
         catch (Exception ex)
         {
-            var xxx = ex.Message;
+            errorMessage = ex.Message;
+            showError = true;
         }
     }
 

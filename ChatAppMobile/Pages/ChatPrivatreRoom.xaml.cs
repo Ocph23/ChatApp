@@ -119,7 +119,7 @@ public partial class ChatPrivatreRoom : ContentPage
         {
             try
             {
-                if(IsBusy)
+                if (IsBusy)
                     return;
                 IsBusy = true;
                 var message = x as Message;
@@ -154,7 +154,7 @@ public partial class ChatPrivatreRoom : ContentPage
             }
             finally
             {
-                IsBusy=false;
+                IsBusy = false;
             }
         }
 
@@ -189,7 +189,7 @@ public partial class ChatPrivatreRoom : ContentPage
             }
             catch (Exception ex)
             {
-              await  Shell.Current.DisplayAlert("Error",ex.Message,"Ok");
+                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
             }
             finally
             {
@@ -200,7 +200,9 @@ public partial class ChatPrivatreRoom : ContentPage
         private async Task FileCommandAction(object obj)
         {
 
-            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery", "Camera");
+            if (IsBusy)
+                return;
+            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery");
             if (!string.IsNullOrEmpty(action))
             {
                 if (action == "Galery")
@@ -223,6 +225,8 @@ public partial class ChatPrivatreRoom : ContentPage
                                 result.FileName.EndsWith("pdf", StringComparison.OrdinalIgnoreCase))
                             {
 
+                                IsBusy = true;
+
                                 using var stream = await result.OpenReadAsync();
                                 using var memoryStream = new MemoryStream();
                                 await stream.CopyToAsync(memoryStream);
@@ -233,7 +237,7 @@ public partial class ChatPrivatreRoom : ContentPage
                                 var accountService = ServiceHelper.GetService<IAccountService>();
                                 var recivePublicKeyString = await accountService.RequestPublicKey(Teman.TemanId);
 
-                                
+
                                 var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
 
                                 var dataEncript = Helper.Encrypt(data, shardingKey);
@@ -266,23 +270,18 @@ public partial class ChatPrivatreRoom : ContentPage
                                     return;
                                 }
                             }
+                            else
+                            {
+                                throw new SystemException("Maaf File Tidak Didukung");
+                            }
                         }
-                        return;
+                        IsBusy = false;
                     }
                     catch (Exception ex)
                     {
-                        // The user canceled or something went wrong
+                        IsBusy = false;
+                        await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
                     }
-                    return;
-                }
-
-
-
-                if (action == "Camera")
-                {
-
-
-                    return;
                 }
             }
         }

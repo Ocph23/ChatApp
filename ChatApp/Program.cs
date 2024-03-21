@@ -13,6 +13,9 @@ using Microsoft.OpenApi.Models;
 using Shared.Contracts;
 using Amazon.S3;
 using Amazon.S3.Util;
+using Microsoft.AspNetCore.HttpOverrides;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,12 @@ if (builder.Environment.IsProduction())
         serverOptions.ListenLocalhost(5028);
     });
 }
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 
 builder.Services.AddCors(options =>
@@ -102,10 +111,13 @@ builder.Services.AddOcphAuthServe(builder.Configuration);
 builder.Services.AddSingleton<IChatUserManager, ChatUserManager>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-var op = builder.Configuration.GetAWSOptions();
-builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonS3>();
-
+AWSOptions awsOptions = new AWSOptions
+{
+    Credentials = new BasicAWSCredentials("AKIA5FTY64XH7B4H755C", "gGjAvZC/cJHEUMPGxtVSsiV5ZbXvNX9GRaJCajB6"),
+    Region = Amazon.RegionEndpoint.APSoutheast2
+};
+builder.Services.AddDefaultAWSOptions(awsOptions);
+builder.Services.AddAWSService<IAmazonS3>(awsOptions);
 var app = builder.Build();
 
 //database seed
@@ -125,7 +137,6 @@ using (var scope = app.Services.CreateScope())
         await roleManager.CreateAsync(new IdentityRole { Name = "User" });
     }
 
-
     if (!dbcontext.Users.Any())
     {
         var user = new ApplicationUser("admin@gmail.com") { Name = "Admin", Email = "admin@gmail.com", EmailConfirmed = true };
@@ -144,16 +155,21 @@ using (var scope = app.Services.CreateScope())
 app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseAuthorization();
-
+app.UseBlazorFrameworkFiles();
+app.MapFallbackToFile("index.html");
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
 

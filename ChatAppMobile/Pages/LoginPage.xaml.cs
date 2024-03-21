@@ -88,7 +88,7 @@ public partial class LoginPage : ContentPage
             set { SetProperty(ref registerCommand, value); }
         }
 
-        private string? userName = "ocph23@gmail.com";
+        private string? userName ;
 
         public string? UserName
         {
@@ -96,7 +96,7 @@ public partial class LoginPage : ContentPage
             set { SetProperty(ref userName, value); }
         }
 
-        private string? password = "Sony@77";
+        private string? password ;
 
         public string? Password
         {

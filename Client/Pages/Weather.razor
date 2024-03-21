@@ -1,4 +1,5 @@
 ﻿@page "/weather"
+@using System.Text.Json
 @inject HttpClient Http
 
 <PageTitle>Weather</PageTitle>
@@ -41,7 +42,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        var x = await Http.GetAsync("WeatherForecast");
+        if (x.IsSuccessStatusCode)
+        {
+            var dataString = await x.Content.ReadAsStringAsync();
+            forecasts = JsonSerializer.Deserialize<WeatherForecast[]>(dataString);
+        }
     }
 
     public class WeatherForecast

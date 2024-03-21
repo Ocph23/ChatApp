@@ -34,7 +34,6 @@
                     </Label.GestureRecognizers>
                 </Label>
             </HorizontalStackLayout>
-            <Entry HorizontalOptions="Center" Text="{Binding URL}"></Entry>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

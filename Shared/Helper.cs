@@ -10,8 +10,8 @@ namespace Shared
     public class Helper
     {
 
-        public static string ServerURL => "https://w1vstpff-7148.asse.devtunnels.ms";
-        //  public static string ServerURL => "https://localhost:7148";
+      //  public static string ServerURL => "https://chatapp.ocph23.tech/";
+        public static string ServerURL => "https://localhost:7148";
         public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         public static string TitleCaseWithSpace(string p) => Regex.Replace(p, @"(?<=[a-z])([A-Z])", @" $1");
@@ -30,7 +30,7 @@ namespace Shared
             }
         }
 
-        public static byte[] Encrypt(byte[] data,string _key)
+        public static byte[] Encrypt(byte[] data, string _key)
         {
             if (CanPerformCryptography(data))
             {
@@ -38,7 +38,7 @@ namespace Shared
                 {
 
                     aes.Key = Convert.FromBase64String(_key);
-                    aes.IV= Convert.FromBase64String("h9GeWnVeV2no4pkircgXAg==");
+                    aes.IV = Convert.FromBase64String("h9GeWnVeV2no4pkircgXAg==");
                     using (var encryptor = aes.CreateEncryptor())
                     {
                         return PerformCryptography(encryptor, data);

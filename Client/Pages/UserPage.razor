@@ -1,0 +1,87 @@
+﻿@page "/user"
+@using Microsoft.AspNetCore.Authorization
+@using System.Text.Json
+@using Shared
+@attribute [Authorize]
+
+@inject HttpClient Http
+
+
+
+<PageTitle>DATA PENGGUNA</PageTitle>
+
+<h1>DATA PENGGUNA</h1>
+
+<p>Seluruh Data Pengguna Aplikasi Chat.</p>
+
+@if (datas == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>User Name</th>
+                <th>Status Aktif</th>
+                <th  style="width:100px; text-align:right"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in datas)
+            {
+                <tr>
+                    <td>@forecast.Name</td>
+                    <td>@forecast.UserName</td>
+                    <td><InputCheckbox Disabled="true" @bind-Value="forecast.EmailConfirmed"></InputCheckbox></td>
+                    <td>
+                        @if (forecast.EmailConfirmed)
+                        {
+                            <button @onclick="@(async()=>await ChangeStatus(forecast))">Block</button>
+                        }
+                        else
+                        {
+                            <button @onclick="@(async()=>await ChangeStatus(forecast))">Aktifkan</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private UserModel[]? datas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync("api/admin/users");
+        if (x.IsSuccessStatusCode)
+        {
+            var dataString = await x.Content.ReadAsStringAsync();
+            datas = JsonSerializer.Deserialize<UserModel[]>(dataString, Helper.JsonOptions);
+        }
+    }
+
+
+    async Task ChangeStatus(UserModel model)
+    {
+        var x = await Http.PutAsJsonAsync<UserModel>($"api/admin/changestatus/{model.Id}", model);
+        if (x.IsSuccessStatusCode)
+        {
+            model.EmailConfirmed = !model.EmailConfirmed;
+        }
+    }
+
+    public class UserModel
+    {
+        public string? Id { get; set; }
+
+        public string? Name { get; set; }
+        public string? UserName { get; set; }
+        public bool EmailConfirmed { get; set; }
+    }
+}
+

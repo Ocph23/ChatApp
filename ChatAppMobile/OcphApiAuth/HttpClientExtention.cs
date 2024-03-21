@@ -75,7 +75,7 @@ namespace OcphApiAuth.Client
 
                 var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrEmpty(content))
-                    throw new SystemException();
+                    throw new SystemException("Maaf terjadi kesalahan, Coba ulangi lagi");
 
                 if (content.Contains("message"))
                 {

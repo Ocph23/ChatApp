@@ -1,84 +1,64 @@
 ﻿@page "/group"
-
-@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Authorization
+@using System.Text.Json
 @using Shared
+@attribute [Authorize]
 
-@inject ILocalStorageService LocalStorageService
-@inject IContactService contactService
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject ChatClient chatClient
-
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-<div class="alert alert-warning" role="alert">
-    Before authentication will function correctly, you must configure your provider details in <code>Program.cs</code>
-</div>
-
-Welcome to your new app.
+@inject HttpClient Http
 
 
-<AuthorizeView>
-    Siapa
-</AuthorizeView>
 
+<PageTitle>DATA GROUP</PageTitle>
 
-<div class="form-group">
-    <label>
-        User:
-        <input @bind="userInput" />
-    </label>
-</div>
-<div class="form-group">
-    <label>
-        Message:
-        <input @bind="messageInput" size="50" />
-    </label>
-</div>
+<h1>DATA GROUP</h1>
 
+<p>Seluruh Data Group.</p>
 
-<button @onclick="SetCurentRoom">Chat To</button>
-<button @onclick="@(()=>  chatClient.Send(messageInput))">Send</button>
-
-<hr>
-
-<ul id="messagesList">
-    @if (chatClient != null && chatClient.CurrentRoom != null)
-    {
-        @foreach (var message in chatClient.CurrentRoom.Messages)
-        {
-            <li>@($"{message.Tanggal} - {message.Text}")</li>
-        }
-    }
-</ul>
+@if (datas == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nama Group</th>
+                <th>Deskripsi</th>
+                <th>Dibuat Oleh</th>
+                <th>Anggota</th>
+                <th style="width:100px; text-align:right">Tanggal Buat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in datas)
+            {
+                <tr>
+                    <td>@forecast.NameGroup</td>
+                    <td>@forecast.Description</td>
+                    <td>@forecast.Owner</td>
+                    <td>@forecast.JumlahAnggota</td>
+                    <td>@forecast.Created.ToString("dd MMM yyyy")</td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
-    private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
-    private string? userInput;
-    private string? messageInput;
+    private GroupDTO[]? datas;
 
     protected override async Task OnInitializedAsync()
     {
-        await chatClient.Start();
-        chatClient.OnReciveGroupMessage += OnReciveGroupMessage;
-    }
-
-    void OnReciveGroupMessage(object obj, MessageGroup ev)
-    {
-        var message = obj as Message;
-        messages.Add(message.Text);
-        InvokeAsync(()=> StateHasChanged());
+        var x = await Http.GetAsync("api/admin/groups");
+        if (x.IsSuccessStatusCode)
+        {
+            var dataString = await x.Content.ReadAsStringAsync();
+            datas = JsonSerializer.Deserialize<GroupDTO[]>(dataString, Helper.JsonOptions);
+        }
     }
 
 
-    async Task SetCurentRoom()
-    {
-        await chatClient.SetCurrentChat(userInput);
-       await InvokeAsync(() => StateHasChanged());
-    }
 }
-
-
 

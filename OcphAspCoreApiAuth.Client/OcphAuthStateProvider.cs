@@ -30,7 +30,7 @@ public class OcphAuthStateProvider : AuthenticationStateProvider
         {
             ArgumentNullException.ThrowIfNullOrEmpty(nameof(token));
             string secret = "O0ywQA1xv4h1EXL4cnsQ4ReHEoqwMuejtXB4KxOeTCB4nOpV4yVegegbEgtzsZWfl5wlBWBY5kpUPVsEmkVr3V9sxvOPmT4YR3PvUCiw7s1xMrSoCMVqnG7VlSeO469Z";
-            string issuer = "https://chatapp.apspapua.com/";
+            string issuer = "https://chatapp.ocph23.tech/";
             await Task.Delay(100);
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken validatedToken = null;

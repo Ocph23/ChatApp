@@ -26,7 +26,7 @@ public class OcphAuthStateProvider
         {
             ArgumentNullException.ThrowIfNullOrEmpty(nameof(token));
             string secret = "O0ywQA1xv4h1EXL4cnsQ4ReHEoqwMuejtXB4KxOeTCB4nOpV4yVegegbEgtzsZWfl5wlBWBY5kpUPVsEmkVr3V9sxvOPmT4YR3PvUCiw7s1xMrSoCMVqnG7VlSeO469Z";
-            string issuer = "https://chatapp.apspapua.com/";
+            string issuer = "https://chatapp.ocph23.tech/";
             await Task.Delay(100);
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken validatedToken;
@@ -65,7 +65,7 @@ public class OcphAuthStateProvider
             user = new ClaimsPrincipal(identity);
             return user;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return user;
         }
@@ -76,8 +76,8 @@ public class OcphAuthStateProvider
         var result = await this.GetAuthenticationStateAsync();
         if (result.Identity.IsAuthenticated)
         {
-            var claim= result.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier"));
-            if(claim != null)
+            var claim = result.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier"));
+            if (claim != null)
             {
                 return claim.Value;
             }

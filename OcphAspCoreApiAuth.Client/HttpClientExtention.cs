@@ -67,13 +67,14 @@ namespace OcphApiAuth.Client
                 if (response.StatusCode == System.Net.HttpStatusCode.MethodNotAllowed)
                     return $"'{response.RequestMessage.RequestUri.LocalPath}'  Method Not Allowed";
 
+                var content = await response.Content.ReadAsStringAsync();
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-
-                    return $"'{response.RequestMessage.RequestUri.LocalPath}'  Anda Tidak Memiliki Akses !";
+                    if (!string.IsNullOrEmpty(content))
+                        return content;
+                    return $"Anda Tidak Memiliki Akses !";
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrEmpty(content))
                     throw new SystemException();
 

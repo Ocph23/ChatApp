@@ -1,0 +1,24 @@
+@host = https://chatapp.ocph23.tech
+##@host = https://localhost:7148
+
+@token = bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3NDI2YzAzLTdjNTktNGU1Yy05NzA4LWU0ZDQ0NDM0ZjNhZCIsIm5hbWUiOiJhbGRyaWNoQGdtYWlsLmNvbSIsInN1YiI6ImFsZHJpY2hAZ21haWwuY29tIiwiZW1haWwiOiJhbGRyaWNoQGdtYWlsLmNvbSIsImp0aSI6ImY5MzM3Mjk2LTczZTItNGJiNi1iOTExLTU4MGU4OTI4YzBkNiIsInJvbGUiOiJVc2VyIiwibmJmIjoxNzA5NzMxMTY5LCJleHAiOjE3MTAzMzU5NjksImlhdCI6MTcwOTczMTE2OSwiaXNzIjoiaHR0cHM6Ly9jaGF0YXBwLm9jcGgyMy50ZWNoLyIsImF1ZCI6Imh0dHBzOi8vY2hhdGFwcC5vY3BoMjMudGVjaC8ifQ.t75QHmLgm2TSuxHEB6KTxZy6zv_9BYpICwDLbqJvHwjR6v7qZ4tdGoSjC9k-GEOXAEW9RKIvpvLZ3ToXz8uy4A
+Get {{host}}/weatherforecast HTTP/1.1
+Content-Type: application/json
+
+#### 
+POST {{host}}/api/account/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "UserName":"aldrich@gmail.com",
+    "Password":"Sony@77"
+}
+
+####
+
+
+Get {{host}}/api/contact HTTP/1.1
+Content-Type: application/json
+Authorization: {{token}}
+
+####

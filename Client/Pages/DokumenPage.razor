@@ -1,0 +1,59 @@
+﻿@page "/document"
+@using Microsoft.AspNetCore.Authorization
+@using System.Text.Json
+@using Shared
+@attribute [Authorize]
+
+@inject HttpClient Http
+
+
+
+<PageTitle>DATA DOKUMEN</PageTitle>
+
+<h1>DATA DOKUMEN</h1>
+
+<p>Seluruh Data File Yang Di Upload.</p>
+
+@if (datas == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th >Tanggal</th>
+                <th>URL</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in datas)
+            {
+                <tr>
+                    <td>@item.Tanggal</td>
+                    <td>@item.UrlFile</td>
+                    <td><a href="@("/api/Files/getbykey?key="+@item.UrlFile)">Download</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private DocumentDTO[]? datas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync("api/admin/documents");
+        if (x.IsSuccessStatusCode)
+        {
+            var dataString = await x.Content.ReadAsStringAsync();
+            datas = JsonSerializer.Deserialize<DocumentDTO[]>(dataString, Helper.JsonOptions);
+        }
+    }
+
+
+}
+

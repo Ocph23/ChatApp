@@ -162,10 +162,7 @@ namespace ChatApp.Controllers
                 if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
                 var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
 
-                //using MemoryStream ms = new MemoryStream();
-                //s3Object.ResponseStream.CopyTo(ms);
-                //var dataDecrypt = Helper.Decrypt(ms.ToArray(), "PJC7HnliwcxXw4FM8Ep3sX9NIL3R5CZnDvp8IyyCSlg=");
-                return File(s3Object.ResponseStream, s3Object.Headers.ContentType);
+                return File(s3Object.ResponseStream, s3Object.Headers.ContentType, key);
             }
             catch (Exception ex)
             {

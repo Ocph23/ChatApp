@@ -9,6 +9,8 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using System.Collections.Generic;
 using ChatAppMobile.Services;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Storage;
 
 namespace ChatAppMobile.Pages;
 
@@ -53,7 +55,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
     public Command BackCommand { get; set; }
     public Command AddMemberCommand { get; private set; }
     public Command FileCommand { get; set; }
-
+    public Command DownloadFileCommand { get; private set; }
     public Command SendCommand
     {
         get { return sendCommand; }
@@ -97,6 +99,8 @@ public class ChatGroupRoomViewModel : BaseViewModel
         FileCommand = new Command(async (x) => FileCommandAction(x));
         BackCommand = new Command(BackCommandAction);
         SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
+        DownloadFileCommand = new Command(async (x) => await DownloadFileCommandAction(x));
+
         Group = group;
         Title = group.NameGroup;
         this.PropertyChanged += (s, p) =>
@@ -117,10 +121,10 @@ public class ChatGroupRoomViewModel : BaseViewModel
 
     private async Task FileCommandAction(object obj)
     {
-        string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery", "Camera");
+        string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "File");
         if (!string.IsNullOrEmpty(action))
         {
-            if (action == "Galery")
+            if (action == "File")
             {
                 try
                 {
@@ -128,9 +132,10 @@ public class ChatGroupRoomViewModel : BaseViewModel
                     if (result != null)
                     {
 
-                        // pdf, xlx, xlsx, doc, docx, jpg dan pptx p
-
                         if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("zip", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("rar", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("7z", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
@@ -152,7 +157,15 @@ public class ChatGroupRoomViewModel : BaseViewModel
                             if (!string.IsNullOrEmpty(fileName))
                             {
                                 var messageService = ServiceHelper.GetService<IMessageService>();
-                                var item = new MessageGroup { MessageType = MessageType.File, UrlFile = fileName , GroupId=Group.Id, Tanggal=DateTime.Now, PengirimId=MyId};
+                                var item = new MessageGroup
+                                {
+                                    Text = fileName, 
+                                    MessageType = MessageType.File,
+                                    UrlFile = fileName,
+                                    GroupId = Group.Id,
+                                    Tanggal = DateTime.Now,
+                                    PengirimId = MyId
+                                };
                                 item.IsMe = item.PengirimId == MyId;
                                 Messages.Add(item);
                                 if (!item.IsMe)
@@ -235,5 +248,48 @@ public class ChatGroupRoomViewModel : BaseViewModel
         OnAddItem?.Invoke(message, null);
         await Task.Delay(200);
         Message = string.Empty;
+    }
+
+    private async Task DownloadFileCommandAction(object x)
+    {
+        try
+        {
+            if (IsBusy)
+                return;
+            IsBusy = true;
+            var message = x as Message;
+            var fileService = ServiceHelper.GetService<IFileServices>();
+            var response = await fileService.DownloadFile(message);
+
+            var cancellationToken = new CancellationToken();
+            /////api / Files / uploadgroupfile ? groupid = 3
+            /////
+            //var accountService = ServiceHelper.GetService<IAccountService>();
+            //var recivePublicKeyString = await accountService.RequestPublicKey(Teman.TemanId);
+
+
+            //var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
+
+            //var dataEncript = AppHelper.Decrypt(response, shardingKey);
+
+            using var stream = new MemoryStream(response);
+            var fileSaverResult = await FileSaver.Default.SaveAsync(message.Text, stream, cancellationToken);
+            if (fileSaverResult.IsSuccessful)
+            {
+                await Toast.Make($"The file was saved successfully to location: {fileSaverResult.FilePath}").Show(cancellationToken);
+            }
+            else
+            {
+                await Toast.Make($"The file was not saved successfully with error: {fileSaverResult.Exception.Message}").Show(cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            await AppShell.Current.DisplayAlert("Error", ex.Message, "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }

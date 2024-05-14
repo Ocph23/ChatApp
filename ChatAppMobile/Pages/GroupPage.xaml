@@ -10,7 +10,6 @@
         <converter:IsNewCountConverter x:Key="isNewCountConverter"></converter:IsNewCountConverter>
     </ContentPage.Resources>
     <ContentPage.ToolbarItems >
-        <ToolbarItem Text="Search" Clicked="ToolbarItem_Clicked" IconImageSource="add.png" />
         <ToolbarItem Order="Secondary" Command="{Binding AddCommandGroup}" Text="Buat Group" IconImageSource="add.png" />
     </ContentPage.ToolbarItems>
 

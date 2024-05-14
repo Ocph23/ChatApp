@@ -12,5 +12,6 @@ namespace Shared
         public int Id { get; set; }
         public string Tanggal { get; set; }
         public string? UrlFile { get; set; }
+        public string Source { get; set; }
     }
 }

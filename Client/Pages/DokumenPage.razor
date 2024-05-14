@@ -4,8 +4,9 @@
 @using Shared
 @attribute [Authorize]
 
-@inject HttpClient Http
-
+@inject NavigationManager nav
+@inject IJSRuntime Js
+@inject HttpClient httpClient
 
 
 <PageTitle>DATA DOKUMEN</PageTitle>
@@ -23,7 +24,8 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th >Tanggal</th>
+                <th>Tanggal</th>
+                <th>Sumber</th>
                 <th>URL</th>
                 <th></th>
             </tr>
@@ -33,20 +35,22 @@ else
             {
                 <tr>
                     <td>@item.Tanggal</td>
+                    <td>@item.Source</td>
                     <td>@item.UrlFile</td>
-                    <td><a href="@("/api/Files/getbykey?key="+@item.UrlFile)">Download</a></td>
+                    <td><a style="cursor:pointer" @onclick="@(async ()=>await download(@item.UrlFile))">Download</a></td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+
 @code {
     private DocumentDTO[]? datas;
 
     protected override async Task OnInitializedAsync()
     {
-        var x = await Http.GetAsync("api/admin/documents");
+        var x = await httpClient.GetAsync("api/admin/documents");
         if (x.IsSuccessStatusCode)
         {
             var dataString = await x.Content.ReadAsStringAsync();
@@ -55,5 +59,15 @@ else
     }
 
 
-}
+    async Task download(string key)
+    {
+        var response = await httpClient.GetAsync($"/api/files/getbykey?key={key}");
+        if (response.IsSuccessStatusCode)
+        {
+            var stream = await response.Content.ReadAsStreamAsync();
+            using var streamRef = new DotNetStreamReference(stream);
+            await Js.InvokeVoidAsync("saveFile", key, streamRef);
+        }
+    }
 
+}

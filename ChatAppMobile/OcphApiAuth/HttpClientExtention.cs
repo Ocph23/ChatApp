@@ -69,7 +69,7 @@ namespace OcphApiAuth.Client
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    AppHelper.Login();
+                    
                     return $"Not Have Access !";
                 }
 

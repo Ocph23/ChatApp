@@ -135,7 +135,7 @@ public partial class ChatPrivatreRoom : ContentPage
 
                 var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
 
-                var dataEncript = Helper.Decrypt(response, shardingKey);
+                var dataEncript = AppHelper.Decrypt(response, shardingKey);
 
                 using var stream = new MemoryStream(dataEncript);
                 var fileSaverResult = await FileSaver.Default.SaveAsync(message.Text, stream, cancellationToken);
@@ -202,10 +202,10 @@ public partial class ChatPrivatreRoom : ContentPage
 
             if (IsBusy)
                 return;
-            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "Galery");
+            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "File");
             if (!string.IsNullOrEmpty(action))
             {
-                if (action == "Galery")
+                if (action == "File")
                 {
                     try
                     {
@@ -216,6 +216,9 @@ public partial class ChatPrivatreRoom : ContentPage
                             // pdf, xlx, xlsx, doc, docx, jpg dan pptx p
 
                             if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("zip", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("rar", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("7z", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
@@ -240,7 +243,7 @@ public partial class ChatPrivatreRoom : ContentPage
 
                                 var shardingKey = ECC.GetSharderKey(Convert.FromBase64String(recivePublicKeyString));
 
-                                var dataEncript = Helper.Encrypt(data, shardingKey);
+                                var dataEncript = AppHelper.Encrypt(data, shardingKey);
 
                                 var content = new MultipartFormDataContent();
                                 content.Add(new StreamContent(new MemoryStream(dataEncript)), "file", result.FileName);

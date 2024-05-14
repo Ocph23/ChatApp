@@ -24,9 +24,9 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
-                        <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"
-BackgroundColor="{Binding IsMe, Converter={StaticResource messageColorConverter}}"
-StrokeShape="{Binding IsMe, Converter={StaticResource messageBorderConverter}}">
+                        <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}" 
+                                BackgroundColor="{Binding IsMe, Converter={StaticResource messageColorConverter}}"
+                                StrokeShape="{Binding IsMe, Converter={StaticResource messageBorderConverter}}">
                             <StackLayout Margin="15" Padding="5,2">
                                 <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.Text}, Converter={StaticResource messageTypeConverter}}">
                                     <Label x:Name="textxx" Text="{Binding Text}"></Label>

@@ -44,14 +44,29 @@ namespace ChatApp.Controllers
         [HttpGet("documents")]
         public IActionResult GetDocuments()
         {
-            var groups = from x in dbContext.PesanPrivat.Where(x => x.MessageType == MessageType.File)
-                         select new DocumentDTO
-                         {
-                             Id = x.Id,
-                             UrlFile = x.UrlFile.Substring(1,x.UrlFile.Length),
-                             Tanggal = x.Tanggal.Value.ToString(),
-                         };
-            return Ok(groups);
+            List<DocumentDTO> docs = new List<DocumentDTO>();
+            var privateDoc = from x in dbContext.PesanPrivat.Where(x => x.MessageType == MessageType.File)
+                             select new DocumentDTO
+                             {
+                                 Id = x.Id,
+                                 Source = "private",
+                                 UrlFile = x.UrlFile.Substring(1, x.UrlFile.Length),
+                                 Tanggal = x.Tanggal.Value.ToString(),
+                             };
+            docs.AddRange(privateDoc);
+
+            var groupDoc = from x in dbContext.PesanGroup.Where(x => x.MessageType == MessageType.File)
+                           select new DocumentDTO
+                           {
+                               Id = x.Id,
+                               Source ="group",
+                               UrlFile = x.UrlFile.Substring(1, x.UrlFile.Length),
+                               Tanggal = x.Tanggal.Value.ToString(),
+                           };
+
+            docs.AddRange(groupDoc);
+
+            return Ok(docs.OrderByDescending(x => x.Tanggal));
         }
 
         [HttpPut("changestatus/{id}")]

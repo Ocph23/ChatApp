@@ -36,7 +36,6 @@ namespace ChatAppMobile.Messages
 
 
 
-
     internal class GroupMessageChange : ValueChangedMessage<MessageGroup>
     {
         public GroupMessageChange(MessageGroup model) : base(model)

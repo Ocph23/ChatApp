@@ -11,5 +11,7 @@ namespace Shared.Contracts
         Task<IEnumerable<MessageGroup>> GetGroupMessage(int groupId);
         Task<MessageGroup> PostGroupMessage(MessageGroup mesage);
         Task<bool> ReadMassage(string? temanId, string myId);
+        Task<bool> DeletePrivate(int id);
+        Task<bool> DeleteGroup(int id);
     }
 }

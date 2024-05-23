@@ -54,8 +54,17 @@ public class ChatGroupRoomViewModel : BaseViewModel
 
     public Command BackCommand { get; set; }
     public Command AddMemberCommand { get; private set; }
-    public Command FileCommand { get; set; }
+    private Command fileCommand;
+
+    public Command FileCommand
+    {
+        get { return fileCommand; }
+        set { SetProperty(ref fileCommand, value); }
+    }
+
     public Command DownloadFileCommand { get; private set; }
+    public Command DeleteCommand { get; private set; }
+
     public Command SendCommand
     {
         get { return sendCommand; }
@@ -96,11 +105,11 @@ public class ChatGroupRoomViewModel : BaseViewModel
         });
 
         AddMemberCommand = new Command(AddMemberAction);
-        FileCommand = new Command(async (x) => FileCommandAction(x));
+        FileCommand = new Command(async (x) => await FileCommandAction(x), (x) => !IsBusy);
         BackCommand = new Command(BackCommandAction);
         SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
         DownloadFileCommand = new Command(async (x) => await DownloadFileCommandAction(x));
-
+        DeleteCommand = new Command(async (x) => await DeleteCommandAction(x));
         Group = group;
         Title = group.NameGroup;
         this.PropertyChanged += (s, p) =>
@@ -109,11 +118,31 @@ public class ChatGroupRoomViewModel : BaseViewModel
             {
                 SendCommand.ChangeCanExecute();
             }
+
+            if (p.PropertyName == "IsBusy")
+            {
+                FileCommand.ChangeCanExecute();
+            }
         };
 
         _ = LoadMessage();
     }
 
+
+    private async Task DeleteCommandAction(object x)
+    {
+        try
+        {
+            var data = x as MessageGroup;
+            var messageService = ServiceHelper.GetService<IMessageService>();
+            var delete = await messageService.DeleteGroup(data.Id);
+            Messages.Remove(data);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+        }
+    }
     private void AddMemberAction(object obj)
     {
         Shell.Current.ShowPopupAsync(new AddGroupMember(Group));
@@ -121,6 +150,8 @@ public class ChatGroupRoomViewModel : BaseViewModel
 
     private async Task FileCommandAction(object obj)
     {
+        if (IsBusy) return;
+
         string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "File");
         if (!string.IsNullOrEmpty(action))
         {
@@ -128,6 +159,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
             {
                 try
                 {
+                    IsBusy = true;
                     var result = await FilePicker.Default.PickAsync(new PickOptions());
                     if (result != null)
                     {
@@ -138,9 +170,10 @@ public class ChatGroupRoomViewModel : BaseViewModel
                             result.FileName.EndsWith("7z", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("txt", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("docx", StringComparison.OrdinalIgnoreCase) ||
-                           result.FileName.EndsWith("ppt", StringComparison.OrdinalIgnoreCase) ||
+                            result.FileName.EndsWith("ppt", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("pptx", StringComparison.OrdinalIgnoreCase) ||
                             result.FileName.EndsWith("pdf", StringComparison.OrdinalIgnoreCase))
                         {
@@ -159,7 +192,7 @@ public class ChatGroupRoomViewModel : BaseViewModel
                                 var messageService = ServiceHelper.GetService<IMessageService>();
                                 var item = new MessageGroup
                                 {
-                                    Text = fileName, 
+                                    Text = fileName,
                                     MessageType = MessageType.File,
                                     UrlFile = fileName,
                                     GroupId = Group.Id,
@@ -182,24 +215,14 @@ public class ChatGroupRoomViewModel : BaseViewModel
                 }
                 catch (Exception ex)
                 {
-                    // The user canceled or something went wrong
+                    await Shell.Current.DisplayAlert("Err", ex.Message, "OK");
                 }
-                return;
+                finally
+                {
+                    IsBusy = false;
+                }
             }
-
-
-
-            if (action == "Camera")
-            {
-
-
-                return;
-            }
-
-
-
         }
-
     }
 
     private async Task LoadMessage()

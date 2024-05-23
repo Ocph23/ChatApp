@@ -90,6 +90,38 @@ namespace ChatApp
                 return BadRequest(ex.Message);
             }
         }
-       
+
+
+        [HttpDelete("private/{id}")]
+        public async Task<ActionResult<bool>> DeletePrivate(int id)
+        {
+            try
+            {
+                bool result= await messageService.DeletePrivate(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        [HttpDelete("group/{id}")]
+        public async Task<ActionResult<bool>> DeleteGroup(int id)
+        {
+            try
+            {
+                bool result = await messageService.DeleteGroup(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

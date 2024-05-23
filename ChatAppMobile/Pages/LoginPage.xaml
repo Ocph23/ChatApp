@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ChatAppMobile.Pages.LoginPage"
-             BackgroundColor="WhiteSmoke"
              Title="LoginPage">
 
     <ScrollView>
@@ -24,7 +23,7 @@
              Flags="ValidateOnValueChanged" ></toolkit:EmailValidationBehavior>
                 </Entry.Behaviors>
             </Entry>
-            <Entry IsPassword="True" Text="{Binding Password}"></Entry>
+            <Entry IsPassword="True" Placeholder="Password" Text="{Binding Password}"></Entry>
             <ActivityIndicator WidthRequest="45" HorizontalOptions="Center" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"></ActivityIndicator>
             <Button Text="Login" Command="{Binding LoginCommand}" HorizontalOptions="Fill" ></Button>
             <HorizontalStackLayout>

@@ -74,7 +74,7 @@ public class ChatViewModel : BaseViewModel
     private void SelectCommandAction(object obj)
     {
         var teman = obj as TemanViewModel;
-        Shell.Current.Navigation.PushModalAsync(new Pages.ChatPrivatreRoom(teman));
+        Shell.Current.Navigation.PushAsync(new Pages.ChatPrivatreRoom(teman));
     }
 
     private async Task Load()

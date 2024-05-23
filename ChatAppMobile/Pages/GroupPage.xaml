@@ -17,15 +17,12 @@
         <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Groups}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="0" Margin="2" BorderColor="Transparent"  Opacity="0.9">
-                        <Frame.Background>
-                            <LinearGradientBrush EndPoint="1,0">
-                                <GradientStop Color="#cfd9df"      Offset="0.1" />
-                                <GradientStop Color="#e2ebf0"       Offset="1.0" />
-                            </LinearGradientBrush>
-                        </Frame.Background>
+                    <Frame Padding="0" CornerRadius="15" Margin="2" BorderColor="Transparent"  Opacity="0.9" 
+                           BackgroundColor="{AppThemeBinding Light={StaticResource  Gray100}, Dark={StaticResource Gray950}}">
                         <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
-                            <Frame BackgroundColor="Silver" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50"></Frame>
+                            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" HasShadow="True" Grid.Column="0" WidthRequest="45" HeightRequest="45" CornerRadius="50">
+                                <Label FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding NameView}"></Label>
+                            </Frame>
                             <StackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label FontSize="Small" Text="{Binding NameGroup}"></Label>
                                 <Label FontSize="Micro" Text="{Binding Description}"></Label>

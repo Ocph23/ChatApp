@@ -40,17 +40,22 @@ public partial class ChatPrivatreRoom : ContentPage
         public string MyId { get; set; }
 
         public event EventHandler OnAddItem;
-
         public ObservableCollection<MessagePrivate> Messages { get; set; } = new ObservableCollection<MessagePrivate>();
-
-
         public TemanViewModel? Teman { get; set; }
 
         private Command sendCommand;
         //private ChatClient chatClient;
 
         public Command BackCommand { get; set; }
-        public Command FileCommand { get; set; }
+
+        private Command fileCommand;
+
+        public Command FileCommand
+        {
+            get { return fileCommand; }
+            set { SetProperty(ref fileCommand , value); }
+        }
+
 
         public Command SendCommand
         {
@@ -59,6 +64,7 @@ public partial class ChatPrivatreRoom : ContentPage
         }
 
         public Command DownloadFileCommand { get; private set; }
+        public Command DeleteCommand { get; private set; }
 
         private string message;
 
@@ -94,13 +100,11 @@ public partial class ChatPrivatreRoom : ContentPage
                 }
             });
 
-            FileCommand = new Command(async (x) => await FileCommandAction(x));
+            FileCommand = new Command(async (x) => await FileCommandAction(x), (x)=> !IsBusy);
             BackCommand = new Command(BackCommandAction);
             SendCommand = new Command(async (x) => await SendCommandAction(x), SendCommandValidate);
             DownloadFileCommand = new Command(async (x) => await DownloadFileCommandAction(x));
-
-
-
+            DeleteCommand= new Command(async (x) => await DeleteCommandAction(x));
 
             Title = teman.Nama;
             Teman = teman;
@@ -110,9 +114,31 @@ public partial class ChatPrivatreRoom : ContentPage
                 {
                     SendCommand.ChangeCanExecute();
                 }
+
+                if (p.PropertyName == "IsBusy")
+                {
+                    FileCommand.ChangeCanExecute();
+                }
+
+
             };
 
             _ = LoadMessage();
+        }
+
+        private async Task DeleteCommandAction(object x)
+        {
+            try
+            {
+                var data = x as MessagePrivate;
+                var messageService = ServiceHelper.GetService<IMessageService>();
+                var delete = await messageService.DeletePrivate(data.Id);
+                Messages.Remove(data);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+            }
         }
 
         private async Task DownloadFileCommandAction(object x)
@@ -199,15 +225,15 @@ public partial class ChatPrivatreRoom : ContentPage
 
         private async Task FileCommandAction(object obj)
         {
-
             if (IsBusy)
                 return;
-            string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "File");
-            if (!string.IsNullOrEmpty(action))
+            try
             {
-                if (action == "File")
+                IsBusy = true;
+                string action = await Shell.Current.DisplayActionSheet("Media ?", "Cancel", null, "File");
+                if (!string.IsNullOrEmpty(action))
                 {
-                    try
+                    if (action == "File")
                     {
                         var result = await FilePicker.Default.PickAsync(new PickOptions());
                         if (result != null)
@@ -222,6 +248,7 @@ public partial class ChatPrivatreRoom : ContentPage
                                 result.FileName.EndsWith("xls", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("doc", StringComparison.OrdinalIgnoreCase) ||
+                                result.FileName.EndsWith("txt", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("docx", StringComparison.OrdinalIgnoreCase) ||
                                result.FileName.EndsWith("ppt", StringComparison.OrdinalIgnoreCase) ||
                                 result.FileName.EndsWith("pptx", StringComparison.OrdinalIgnoreCase) ||
@@ -278,14 +305,16 @@ public partial class ChatPrivatreRoom : ContentPage
                                 throw new SystemException("Maaf File Tidak Didukung");
                             }
                         }
-                        IsBusy = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        IsBusy = false;
-                        await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

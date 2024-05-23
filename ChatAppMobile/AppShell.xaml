@@ -8,11 +8,11 @@
     Title="ChatAppMobile">
     
     <TabBar>
-        <Tab Icon="dotnet_bot.png" Title="Message" >
-            <ShellContent Title="Chat"  
+        <Tab Icon="dotnet_bot.png" Title="Message"  >
+            <ShellContent Title="Chat"  Shell.ForegroundColor="{AppThemeBinding Light={StaticResource OffBlack}, Dark={StaticResource White}}"
                         ContentTemplate="{DataTemplate page:ChatPage}" />
             <ShellContent Title="Group"
-                        ContentTemplate="{DataTemplate page:GroupPage}" />
+                        ContentTemplate="{DataTemplate page:GroupPage}" Shell.ForegroundColor="{AppThemeBinding Light={StaticResource OffBlack}, Dark={StaticResource White}}" />
         </Tab>
         <ShellContent Title="Profile" 
                   Icon="profile.png"

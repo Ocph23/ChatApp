@@ -15,6 +15,17 @@ namespace Client.Services
         {
             this.httpClient = httpClient;
         }
+
+        public Task<bool> DeleteGroup(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeletePrivate(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<MessageGroup>> GetGroupMessage(int groupId)
         {
             try

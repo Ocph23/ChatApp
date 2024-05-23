@@ -107,7 +107,7 @@ namespace ChatAppMobile.Models
         {
             if (hubConnection is not null && IsConnected)
             {
-                var model = new MessageGroup() { Text = message.Text, GroupId = message.GroupId, PengirimId = Contact.UserId, MessageType = Shared.MessageType.Text };
+                var model = new MessageGroup() { Text = message.Text, GroupId = message.GroupId, PengirimId = message.PengirimId, MessageType = Shared.MessageType.Text };
                 await hubConnection.SendAsync("SendGroupMessage", model);
             }
         }

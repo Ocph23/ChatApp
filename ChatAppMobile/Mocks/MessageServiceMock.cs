@@ -19,6 +19,17 @@ namespace ChatAppMobile.Mocks
             new MessagePrivate{ MessageType= MessageType.Text, PenerimaId="2", PengirimId="1", Tanggal=DateTime.Now, Text="Pesan D",
                 Status= MessageStatus.Baru, Id=2 },
         };
+
+        public Task<bool> DeleteGroup(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeletePrivate(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<MessageGroup>> GetGroupMessage(int groupId)
         {
             return Task.FromResult(_messagesGroup.AsEnumerable());

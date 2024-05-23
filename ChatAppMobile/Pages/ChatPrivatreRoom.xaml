@@ -4,10 +4,12 @@
              xmlns:conv ="clr-namespace:ChatAppMobile.Converters"
              x:Class="ChatAppMobile.Pages.ChatPrivatreRoom"
              xmlns:shared ="clr-namespace:Shared;assembly=Shared"
-             Shell.NavBarIsVisible="True" 
-             BackgroundColor="#abbcea"
+             x:Name="chatPage"
              BackgroundImageSource="mobilebg1.jpg"
-             Title="{Binding Title}">
+             NavigationPage.HasNavigationBar="True"
+             Title="{Binding Title}"
+             Shell.TitleColor="{AppThemeBinding Light={StaticResource  Gray950}, Dark={StaticResource  Gray100}}">
+
     <ContentPage.Resources>
         <conv:MessageAlignConverter x:Key="messageAlignConverter"></conv:MessageAlignConverter>
         <conv:MessageBorderConverter x:Key="messageBorderConverter"></conv:MessageBorderConverter>
@@ -15,60 +17,53 @@
         <conv:MessageColorConverter x:Key="messageColorConverter"></conv:MessageColorConverter>
         <conv:MessageTypeConverter x:Key="messageTypeConverter"></conv:MessageTypeConverter>
     </ContentPage.Resources>
+
     <Grid RowDefinitions="auto,*">
-        <HorizontalStackLayout Padding="10" Opacity="0.95" BackgroundColor="#abbcea">
-            <Image VerticalOptions="Center">
-                <Image.Source>
-                    <FontImageSource FontFamily="FASolid" Glyph="{StaticResource back}"
-                                     Color="White" />
-                </Image.Source>
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BackCommand}"></TapGestureRecognizer>
-                </Image.GestureRecognizers>
-            </Image>
-            <Frame  Margin="5,0" Padding="0" VerticalOptions="Center" BackgroundColor="Silver" 
-                    HasShadow="True" Grid.Column="0" WidthRequest="40" HeightRequest="40"
-                    CornerRadius="30" >
-                <Image WidthRequest="25" HeightRequest="25" HorizontalOptions="Center" 
-                       Source="profile.png" ></Image>
-            </Frame>
-            <Label Text="{Binding Teman.Nama}" TextColor="White" FontSize="Medium" VerticalOptions="Center" Margin="5,0"></Label>
-        </HorizontalStackLayout>
+
         <Grid Grid.Row="1" RowDefinitions="*,auto" >
 
             <RefreshView IsRefreshing="{Binding IsBusy}">
                 <CollectionView    Grid.Row="0" Margin="20"  x:Name="list" ItemsSource="{Binding Messages}" SelectionMode="None"
                SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
                SelectionChangedCommand="{Binding SelectCommand}">
-                    <CollectionView.ItemTemplate> 
+                    <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
-                                <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"
+                            <SwipeView Threshold="200">
+                                <SwipeView.LeftItems>
+                                    <SwipeItems Mode="Reveal">
+                                        <SwipeItem BackgroundColor="Red" Text="Hapus" IsVisible="{Binding IsMe}"
+                                                   CommandParameter="{Binding .}"
+                                             Command="{Binding Path=BindingContext.DeleteCommand, Source={x:Reference list}}" />
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
+                                <!-- Content -->
+                                <Grid Margin="3" ColumnDefinitions="{Binding IsMe, Converter={StaticResource messageGridColumnConverter}}" >
+                                    <Border StrokeThickness="0" Grid.Column="{Binding IsMe, Converter={StaticResource messageAlignConverter}}"
          BackgroundColor="{Binding IsMe, Converter={StaticResource messageColorConverter}}"
          StrokeShape="{Binding IsMe, Converter={StaticResource messageBorderConverter}}">
-                                    <StackLayout Margin="15" Padding="5,2">
-                                        <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.Text}, Converter={StaticResource messageTypeConverter}}">
-                                            <Label x:Name="textxx" Text="{Binding Text}"></Label>
-                                            <Label x:Name="date2x" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
-                                        </StackLayout>
-                                        <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.File}, Converter={StaticResource messageTypeConverter}}">
-                                            <Grid ColumnDefinitions="auto,*,auto">
-                                                <Label VerticalOptions="End" Grid.Column="0" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid"  Text="&#xf0c6;" 
+                                        <StackLayout Margin="15" Padding="5,2">
+                                            <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.Text}, Converter={StaticResource messageTypeConverter}}">
+                                                <Label x:Name="textxx" TextColor="Black" Text="{Binding Text}"></Label>
+                                                <Label x:Name="date2x" TextColor="Black" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
+                                            </StackLayout>
+                                            <StackLayout IsVisible="{Binding MessageType, ConverterParameter={x:Static shared:MessageType.File}, Converter={StaticResource messageTypeConverter}}">
+                                                <Grid ColumnDefinitions="auto,*,auto">
+                                                    <Label VerticalOptions="End" Grid.Column="0" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid"  Text="&#xf0c6;" 
                                                    TextColor="DimGray" FontSize="20" Padding="10,0" HeightRequest="40" WidthRequest="40" ></Label>
-                                                <Label Grid.Column="1" x:Name="text1" Text="{Binding Text}"></Label>
-                                                <Grid Grid.Column="2">
-                                                    <Button  HorizontalOptions="End" Command="{Binding Path=BindingContext.DownloadFileCommand, Source={Reference list}}" 
+                                                    <Label TextColor="Black" Grid.Column="1" x:Name="text1" Text="{Binding Text}"></Label>
+                                                    <Grid Grid.Column="2">
+                                                        <Button  HorizontalOptions="End" Command="{Binding Path=BindingContext.DownloadFileCommand, Source={Reference list}}" 
                                                      CommandParameter="{Binding .}" VerticalOptions="End" 
                                                      CornerRadius="30" Grid.Column="2" Margin="5"  BackgroundColor="Transparent" FontFamily="FASolid" Text="&#xf01a;"
                                                      TextColor="DimGray" FontSize="30" Padding="10,0" ></Button>
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
-                                            <Label x:Name="date1" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
+                                                <Label x:Name="date1" TextColor="Black" HorizontalOptions="End" FontSize="Micro" Text="{Binding Tanggal,StringFormat='{0:dd-MM-yyyy HH:mm}'}"></Label>
+                                            </StackLayout>
                                         </StackLayout>
-
-                                    </StackLayout>
-                                </Border>
-                            </Grid>
+                                    </Border>
+                                </Grid>
+                            </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
@@ -85,7 +80,6 @@
                     CornerRadius="30" Grid.Column="2" Margin="5" 
                     FontFamily="FASolid" Text="&#xf1d8;" Padding="10,0"
                     HeightRequest="40" WidthRequest="40" ></Button>
-
                     </Grid>
                 </Frame>
             </Grid>

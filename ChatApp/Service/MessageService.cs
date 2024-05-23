@@ -88,6 +88,38 @@ namespace ChatApp.Service
             }
         }
 
-        
+        public Task<bool> DeletePrivate(int id)
+        {
+            try
+            {
+                var data = dbcontext.PesanPrivat.SingleOrDefault(p => p.Id == id);
+                if (data == null)
+                    throw new SystemException("Data Tidak Ditemukan !");
+                dbcontext.PesanPrivat.Remove(data);
+                dbcontext.SaveChanges();
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
+        public Task<bool> DeleteGroup(int id)
+        {
+            try
+            {
+                var data = dbcontext.PesanGroup.SingleOrDefault(p => p.Id == id);
+                if (data == null)
+                    throw new SystemException("Data Tidak Ditemukan !");
+                dbcontext.PesanGroup.Remove(data);
+                dbcontext.SaveChanges();
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
     }
 }

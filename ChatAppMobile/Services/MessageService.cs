@@ -15,6 +15,41 @@ namespace ChatAppMobile.Services
         {
             this.httpClient = httpClient;
         }
+
+        public async Task<bool> DeleteGroup(int id)
+        {
+            try
+            {
+                var response = await httpClient.DeleteAsync($"{controller}/group/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.GetResultAsync<bool>();
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeletePrivate(int id)
+        {
+            try
+            {
+                var response = await httpClient.DeleteAsync($"{controller}/private/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.GetResultAsync<bool>();
+                }
+                throw new SystemException(await response.Error());
+            }
+            catch (Exception ex)
+            {
+                throw new SystemException(ex.Message);
+            }
+        }
+
         public async Task<IEnumerable<MessageGroup>> GetGroupMessage(int groupId)
         {
             try

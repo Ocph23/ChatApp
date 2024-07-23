@@ -13,7 +13,7 @@ namespace ChatApp.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IAmazonS3 _s3Client;
-        private string bucketName = "ocph23";
+        private string bucketName = "ustjchatapp";
         public FilesController(IAmazonS3 s3Client)
         {
             _s3Client = s3Client;

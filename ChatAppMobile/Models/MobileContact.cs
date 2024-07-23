@@ -1,6 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,9 @@ namespace ChatAppMobile.Models
         public string? Name { get; set; }
         public string? UserName { get; set; }
         public string? Photo { get; set; }
-        public ICollection<TemanViewModel>? Friends { get; set; } = new List<TemanViewModel>();
-        public ICollection<GroupDTO>? Groups { get; set; } = new List<GroupDTO>();
+        public ObservableCollection<TemanViewModel>? Friends { get; set; } = new ObservableCollection<TemanViewModel>();
+        public ObservableCollection<GroupDTO>? Groups { get; set; } = new ObservableCollection<GroupDTO>();
         public string? Email { get; set; }
-
-      
 
         public MobileContact()
         {

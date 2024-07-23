@@ -5,6 +5,7 @@ using ChatAppMobile.Services;
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using OcphApiAuth.Client;
+using ChatAppMobile.Models;
 
 namespace ChatAppMobile.Pages;
 
@@ -12,10 +13,10 @@ public partial class AddGroupPage : Popup
 {
     private AddGroupViewModel vm;
 
-    public AddGroupPage()
+    public AddGroupPage(IEnumerable<Models.TemanViewModel> member)
     {
         InitializeComponent();
-        BindingContext = vm = new AddGroupViewModel();
+        BindingContext = vm = new AddGroupViewModel(member);
         vm.OnCloseAddContact += Vm_OnCloseAddContact1; ;
     }
 
@@ -35,8 +36,9 @@ public class AddGroupViewModel : BaseViewModel
 
     AddGroupValidator validator = new AddGroupValidator();
 
-    public AddGroupViewModel()
+    public AddGroupViewModel(IEnumerable<Models.TemanViewModel> member)
     {
+        Members = member;
         AddCommand = new Command(async (x) => await AddCommandAction(x), AddCommandValidation);
         CancelCommand = new Command(() => OnCloseAddContact?.Invoke(null, this));
         this.PropertyChanged += (s, p) =>
@@ -53,6 +55,8 @@ public class AddGroupViewModel : BaseViewModel
 
 
     public Command addCommand;
+
+    public IEnumerable<TemanViewModel> Members { get; }
 
     public Command AddCommand
     {
@@ -88,11 +92,13 @@ public class AddGroupViewModel : BaseViewModel
             var userid = await authStateProvider.GetUserId();
             if (userid != null)
             {
-                var result = await contactService.CreateGroup(userid, new Shared.GroupDTO() { NameGroup = GroupName, Description = Description });
+                var result = await contactService.CreateGroup(userid, new Shared.GroupDTO() { NameGroup = GroupName, Description = Description, 
+                    Anggota = Members.Select(x=> new Shared.TemanDTO { TemanId= x.TemanId, Keanggotaan= Shared.KeanggotaanGroup.Anggota, Nama=x.Nama }) });
                 if (result != null)
                 {
                     WeakReferenceMessenger.Default.Send(new AddGroupMessageChange(result));
                     OnCloseAddContact?.Invoke(result, this);
+                    await AppHelper.ShowMessage("Group nerhasil dibuat ");
                 }
             }
         }

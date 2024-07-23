@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converter="clr-namespace:ChatAppMobile.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ChatAppMobile.Pages.ChatPage"
              x:Name="page"
             BackgroundImageSource="mobilebg3.jpg"
@@ -11,43 +12,58 @@
     </ContentPage.Resources>
     <ContentPage.ToolbarItems >
         <ToolbarItem Order="Secondary" Command="{Binding AddCommandContact}" Text="Tambah Kontak" IconImageSource="add.png" />
+        <ToolbarItem Order="Secondary" Command="{Binding CreateGroupCommand}" 
+                 IsEnabled="{Binding Source={x:Reference page}, Path=BindingContext.ShowSelectItem}"
+                     Text="Buat Group" IconImageSource="add.png" />
     </ContentPage.ToolbarItems>
-    <VerticalStackLayout >
-      
-        <CollectionView x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="None"
+    <Grid>
+        <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
+        <CollectionView  x:Name="list" ItemsSource="{Binding ChatContact.Friends}" SelectionMode="None"
                         SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference list}}"
+                         
                         SelectionChangedCommand="{Binding SelectCommand}">
-
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="0" CornerRadius="15" Margin="2" BackgroundColor="{AppThemeBinding Light={StaticResource  Gray100}, Dark={StaticResource Gray950}}"
-                           BorderColor="Transparent"  Opacity="0.9">
-                       
-                        <Grid  Margin="5" ColumnDefinitions="20*, 60*, 20*" HeightRequest="50">
-                            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" HasShadow="True" Grid.Column="0" Padding="0" WidthRequest="45" HeightRequest="45" CornerRadius="50">
-                                <Label FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding NameView}"></Label>
-                            </Frame>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label FontSize="Small" Text="{Binding Nama}"></Label>
-                                <Label FontSize="Micro" Text="{Binding Description}"></Label>
-                            </StackLayout>
-                            <StackLayout Grid.Column="2" VerticalOptions="Center">
-                                <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
-                                <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
+                    <Frame Padding="0" CornerRadius="5" Margin="0.51" BackgroundColor="{AppThemeBinding Light={StaticResource  Gray100}, Dark={StaticResource Gray950}}"
+                           BorderColor="Transparent"  Opacity="0.98">
+                        <Grid  Margin="5" ColumnDefinitions="auto, 100*" HeightRequest="50">
+                            <CheckBox IsChecked="{Binding Selected}" Grid.Column="0"
+                                      
+                                      IsVisible="{Binding Source={x:Reference page}, Path=BindingContext.ShowSelectItem}"></CheckBox>
+                            <HorizontalStackLayout Grid.Column="1" >
+                                <Frame  BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}"
+                                HasShadow="True" Padding="0" WidthRequest="45" HeightRequest="45" CornerRadius="50">
+                                    <Label FontSize="Large" HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding NameView}"></Label>
+                                </Frame>
+                                <StackLayout Margin="10,0"  VerticalOptions="Center">
+                                    <Label FontSize="Small" Text="{Binding Nama}"></Label>
+                                    <Label FontSize="Micro" Text="{Binding Description}"></Label>
+                                </StackLayout>
+                                <StackLayout Grid.Column="2" VerticalOptions="Center">
+                                    <Label FontSize="12" Text="{Binding LastMessageDate}" HorizontalOptions="Center"></Label>
+                                    <Frame IsVisible="{Binding Count,Converter={StaticResource isNewCountConverter}}" BackgroundColor="LimeGreen" Padding="2" CornerRadius="30"  
                                    BorderColor="Transparent"
                                    WidthRequest="22" HeightRequest="22">
-                                    <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
-                                </Frame>
-                            </StackLayout>
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}"
-                                                  CommandParameter="{Binding .}"
-                                                  ></TapGestureRecognizer>
-                            </Grid.GestureRecognizers>
+                                        <Label    FontSize="11" Text="{Binding Count}" HorizontalOptions="Center"></Label>
+                                    </Frame>
+                                </StackLayout>
+
+                                <HorizontalStackLayout.Behaviors>
+                                    <toolkit:TouchBehavior Command="{Binding BindingContext.SelectCommand, Source={x:Reference page}}" 
+                               CommandParameter="{Binding .}"
+                            LongPressCommand="{Binding Source={x:Reference page}, Path=BindingContext.ShowItemCommand}"
+                            LongPressCommandParameter="{Binding .}"
+                                                           />
+                                </HorizontalStackLayout.Behaviors>
+                            </HorizontalStackLayout>
+
                         </Grid>
+
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+        </RefreshView>
+
+    </Grid>
 </ContentPage>

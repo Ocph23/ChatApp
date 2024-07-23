@@ -45,7 +45,7 @@ public class GroupViewModel : BaseViewModel
     public GroupViewModel()
     {
         SelectCommand = new Command(SelectCommandAction);
-        AddCommandGroup = new Command(AddCommandGroupAction);
+        //AddCommandGroup = new Command(AddCommandGroupAction);
         WeakReferenceMessenger.Default.Register<AddGroupMessageChange>(this, (r, m) =>
         {
             if (m != null && m.Value != null)
@@ -66,10 +66,10 @@ public class GroupViewModel : BaseViewModel
         _ = Load();
     }
 
-    private void AddCommandGroupAction(object obj)
-    {
-        Shell.Current.ShowPopup(new AddGroupPage());
-    }
+    //private void AddCommandGroupAction(object obj)
+    //{
+    //    Shell.Current.ShowPopup(new AddGroupPage());
+    //}
 
     private void SelectCommandAction(object obj)
     {

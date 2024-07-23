@@ -69,7 +69,7 @@
                 </CollectionView>
             </RefreshView>
             <Grid Padding="10" Grid.Row="1" >
-                <Frame CornerRadius="20" Padding="0" BorderColor="Transparent" Opacity="0.95" BackgroundColor="#f1eed4">
+                <Frame CornerRadius="20" Padding="0" BorderColor="Transparent" Opacity="0.95" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray600}}">
                     <Grid ColumnDefinitions="auto,*,auto">
                         <Button Command="{Binding FileCommand}" VerticalOptions="End" 
                                     CornerRadius="30" Grid.Column="0" Margin="5"  BackgroundColor="Transparent"

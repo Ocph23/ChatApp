@@ -194,6 +194,9 @@ public partial class ChatPrivatreRoom : ContentPage
                 CurrentRoom = new ChatRoom(Teman);
                 var service = ServiceHelper.GetService<IMessageService>();
                 var messgaes = await service.GetPrivateMessage(Teman.TemanId, MyId);
+                if (messgaes.Count() <= 0)
+                    throw new SystemException("Belum ada percakapan !");
+
                 foreach (var item in messgaes)
                 {
                     item.IsMe = item.PengirimId == MyId;
@@ -294,7 +297,7 @@ public partial class ChatPrivatreRoom : ContentPage
                                     {
                                         item.Status = MessageStatus.Baca;
                                     }
-                                    var resultx = await messageService.PostPrivateMessage(item);
+                                    //var resultx = await messageService.PostPrivateMessage(item);
                                     WeakReferenceMessenger.Default.Send(new PrivateSendMessageChange(item));
                                     OnAddItem?.Invoke(Messages.Last(), null);
                                     return;

@@ -22,15 +22,15 @@ namespace ChatApp.Service
             {
                 var newAnggota = dbcontext.Users.FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
                 ArgumentNullException.ThrowIfNull(newAnggota, "Calon Anggota Tidak Ditemuka.");
-                var group = dbcontext.Group.Include(x => x.Anggota.Where(x=>x.Anggota.Id==newAnggota.Id)).SingleOrDefault(x => x.Id == groupid);
+                var group = dbcontext.Group.Include(x => x.Anggota.Where(x => x.Anggota.Id == newAnggota.Id)).SingleOrDefault(x => x.Id == groupid);
                 ArgumentNullException.ThrowIfNull(group, "Data Group Tidak Ditemukan. ");
-                if(group.Anggota.Count>0)
+                if (group.Anggota.Count > 0)
                 {
                     throw new SystemException("User Sudah Menjadi Anggota");
                 }
                 group.Anggota.Add(new AnggotaGroup { Anggota = newAnggota, Keanggotaan = KeanggotaanGroup.Anggota, TanggalBergabung = DateTime.Now.ToUniversalTime() });
                 dbcontext.SaveChanges();
-                return Task.FromResult(new TemanDTO { TemanId = newAnggota.Id, Email = newAnggota.Email, Nama = newAnggota.Name});
+                return Task.FromResult(new TemanDTO { TemanId = newAnggota.Id, Email = newAnggota.Email, Nama = newAnggota.Name });
             }
             catch (Exception)
             {
@@ -63,11 +63,11 @@ namespace ChatApp.Service
         {
             try
             {
-                var newTeman = dbcontext.Users.FirstOrDefault(x => x.UserName.ToLower() == userName || x.Email.ToLower() == userName || x.PhoneNumber.ToLower() ==userName);
+                var newTeman = dbcontext.Users.FirstOrDefault(x => x.UserName.ToLower() == userName || x.Email.ToLower() == userName || x.PhoneNumber.ToLower() == userName);
 
                 ArgumentNullException.ThrowIfNull(newTeman, "Data User Tidak Ditemukan ");
 
-                var exist = dbcontext.Pertemanan.Where(x => (x.UserId == userid && x.TemanId == newTeman.Id)||(x.UserId==newTeman.Id && x.TemanId== userid));
+                var exist = dbcontext.Pertemanan.Where(x => (x.UserId == userid && x.TemanId == newTeman.Id) || (x.UserId == newTeman.Id && x.TemanId == userid));
                 if (exist.Any())
                 {
                     throw new System.Exception($"{userName}/{newTeman.Name} sudah menjadi teman Anda !");
@@ -102,6 +102,20 @@ namespace ChatApp.Service
                 ArgumentNullException.ThrowIfNull(user, "Akun tidak ditemukan !");
                 var g = new Group() { Nama = groupDTO.NameGroup, Deskripsi = groupDTO.Description, Pembuat = user, TanggalBuat = DateTime.Now.ToUniversalTime() };
                 g.Anggota.Add(new AnggotaGroup { Anggota = user, Keanggotaan = KeanggotaanGroup.Admin, TanggalBergabung = DateTime.Now.ToUniversalTime() });
+                foreach (var anggota in groupDTO.Anggota)
+                {
+                    var xUser = dbcontext.Users.FirstOrDefault(x => x.Id == anggota.TemanId);
+                    if (xUser != null)
+                    {
+                        g.Anggota.Add(new AnggotaGroup
+                        {
+                            Anggota = xUser,
+                            Keanggotaan = anggota.Keanggotaan,
+                            TanggalBergabung = DateTime.Now.ToUniversalTime()
+                        });
+
+                    }
+                }
                 dbcontext.Add(g);
                 dbcontext.SaveChanges();
                 var result = new GroupDTO
@@ -114,7 +128,7 @@ namespace ChatApp.Service
                 };
                 return Task.FromResult(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -142,7 +156,7 @@ namespace ChatApp.Service
             {
                 var user = dbcontext.Users.FirstOrDefault(x => x.Id == userid);
                 ArgumentNullException.ThrowIfNull(user, "Akun tidak ditemukan !");
-                var contact = new Contact(userid, user.Name, user.UserName, user.Email, user.Photo );
+                var contact = new Contact(userid, user.Name, user.UserName, user.Email, user.Photo);
                 var temans = dbcontext.Pertemanan
                     .Include(x => x.Teman)
                     .Include(x => x.User)
@@ -151,7 +165,8 @@ namespace ChatApp.Service
                     {
                         Nama = x.UserId == userid ? x.Teman.Name : x.User.Name,
                         TemanId = x.UserId == userid ? x.Teman.Id : x.UserId,
-                        Email = x.UserId == userid ? x.Teman.Email : x.User.Email, Photo= x.User.Photo  
+                        Email = x.UserId == userid ? x.Teman.Email : x.User.Email,
+                        Photo = x.User.Photo
                     });
 
                 if (temans.Any())
@@ -159,7 +174,7 @@ namespace ChatApp.Service
                     contact.Friends = temans.ToList();
                 }
 
-                var anggotaGroup = dbcontext.AnggotaGroup.Include(x=>x.Anggota).Where(x=>x.Anggota.Id==userid);
+                var anggotaGroup = dbcontext.AnggotaGroup.Include(x => x.Anggota).Where(x => x.Anggota.Id == userid);
 
 
                 var group = from a in anggotaGroup

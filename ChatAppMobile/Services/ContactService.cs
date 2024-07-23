@@ -3,6 +3,7 @@ using OcphApiAuth.Client;
 using Shared;
 using Shared.Contracts;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Contact = Shared.Contact;
 
 namespace ChatAppMobile.Services
@@ -72,6 +73,9 @@ namespace ChatAppMobile.Services
         {
             try
             {
+
+                var result = JsonSerializer.Serialize(group);
+
                 var response = await httpClient.PostAsJsonAsync($"{controller}/creategroup", group);
                 if (response.IsSuccessStatusCode)
                 {
@@ -79,9 +83,9 @@ namespace ChatAppMobile.Services
                 }
                 throw new SystemException();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw new SystemException(ex.Message);
             }
         }
 

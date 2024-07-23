@@ -113,8 +113,8 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 AWSOptions awsOptions = new AWSOptions
 {
-    Credentials = new BasicAWSCredentials("AKIA5FTY64XH7B4H755C", "gGjAvZC/cJHEUMPGxtVSsiV5ZbXvNX9GRaJCajB6"),
-    Region = Amazon.RegionEndpoint.APSoutheast2
+    Credentials = new BasicAWSCredentials("AKIA6GBMGKNG4SQMS6QY", "+P7RosxTFxX5PCJn8zy4c08yJfl3PUN4RVklxRB8"),
+    Region = Amazon.RegionEndpoint.USEast1
 };
 builder.Services.AddDefaultAWSOptions(awsOptions);
 builder.Services.AddAWSService<IAmazonS3>(awsOptions);

@@ -104,6 +104,17 @@ namespace ChatAppMobile.Models
             set { SetProperty(ref lastMessageDate, value); }
         }
 
+
+
+        private bool selected;
+
+        public bool Selected
+        {
+            get { return selected; }
+            set { SetProperty(ref selected , value); }
+        }
+
+
         public ObservableCollection<MessagePrivate> Messages { get; set; } = new ObservableCollection<MessagePrivate>();
 
     }
